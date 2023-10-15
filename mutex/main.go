@@ -32,6 +32,7 @@ func main() {
 		go func(i int, income Income) {
 			defer wg.Done()
 
+			// balance.Lock() // Note: For running serially
 			for week := 0; week < 52; week++ {
 				balance.Lock()
 				temp := bankBalance
@@ -41,6 +42,7 @@ func main() {
 
 				fmt.Printf("On week - %d, you earned $%d.00. from %s. Current Balance: %d\n", week, income.Amount, income.Source, bankBalance)
 			}
+			// balance.Unlock()
 		}(i, income)
 	}
 
