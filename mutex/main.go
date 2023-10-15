@@ -5,33 +5,46 @@ import (
 	"sync"
 )
 
-var msg string
 var wg sync.WaitGroup
 
-func UnsafeUpdateMessage(s string) {
-	defer wg.Done()
-	msg = s
-}
-
-func updateMessage(s string, m *sync.Mutex) {
-	defer wg.Done()
-
-	m.Lock()
-	msg = s // Note: Thread safe operation now
-	m.Unlock()
+type Income struct {
+	Source string
+	Amount int
 }
 
 func main() {
-	msg = "Hello"
+	var bankBalance int
+	var balance sync.Mutex
 
-	var mutex sync.Mutex
+	fmt.Printf("Account balance: $%d.00", bankBalance)
+	fmt.Println()
 
-	wg.Add(2)
-	go updateMessage("Alpha", &mutex)
-	go updateMessage("Sigma", &mutex)
+	incomes := []Income{
+		{Source: "Main Job", Amount: 500},
+		{Source: "Gifts", Amount: 10},
+		{Source: "Part Time Job", Amount: 50},
+		{Source: "Investments", Amount: 100},
+	}
+
+	wg.Add(len(incomes))
+
+	for i, income := range incomes {
+		go func(i int, income Income) {
+			defer wg.Done()
+
+			for week := 0; week < 52; week++ {
+				balance.Lock()
+				temp := bankBalance
+				temp += income.Amount
+				bankBalance = temp
+				balance.Unlock()
+
+				fmt.Printf("On week - %d, you earned $%d.00. from %s\n", week, income.Amount, income.Source)
+			}
+		}(i, income)
+	}
+
 	wg.Wait()
 
-	fmt.Println(msg)
+	fmt.Printf("Final Bal: $%d.00\n", bankBalance)
 }
-
-// go run -race . // Note: Check for data race
