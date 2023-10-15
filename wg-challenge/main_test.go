@@ -46,7 +46,6 @@ func TestPrintMessage(t *testing.T) {
 	if !strings.Contains(dataStr, msg) {
 		t.Errorf("printMessage Failed")
 	}
-
 }
 
 func TestPrintUpdateMessage(t *testing.T) {
