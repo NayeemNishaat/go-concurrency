@@ -39,7 +39,7 @@ func main() {
 				bankBalance = temp
 				balance.Unlock()
 
-				fmt.Printf("On week - %d, you earned $%d.00. from %s\n", week, income.Amount, income.Source)
+				fmt.Printf("On week - %d, you earned $%d.00. from %s. Current Balance: %d\n", week, income.Amount, income.Source, bankBalance)
 			}
 		}(i, income)
 	}
