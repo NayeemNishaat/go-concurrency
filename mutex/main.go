@@ -8,6 +8,11 @@ import (
 var msg string
 var wg sync.WaitGroup
 
+func UnsafeUpdateMessage(s string) {
+	defer wg.Done()
+	msg = s
+}
+
 func updateMessage(s string, m *sync.Mutex) {
 	defer wg.Done()
 
