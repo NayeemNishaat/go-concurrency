@@ -11,6 +11,7 @@ import (
 
 const numberOfPizzas = 10
 
+var r = rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64())))
 var pizzasMade, pizzasFailed, total int
 
 type Producer struct {
@@ -34,10 +35,10 @@ func makePizza(pizzaNum int) *PizzaOrder {
 	pizzaNum++
 
 	if pizzaNum <= 10 {
-		delay := rand.Intn(5) + 1
+		delay := r.Intn(5) + 1
 		fmt.Printf("Received order #%d.\n", pizzaNum)
 
-		rnd := rand.Intn(12) + 1
+		rnd := r.Intn(12) + 1
 		msg := ""
 		success := false
 
@@ -97,9 +98,6 @@ func pizzaHut(pizzaMaker *Producer) {
 }
 
 func main() {
-	r := rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64())))
-	fmt.Println(r.Int())
-
 	color.Cyan("The shop is open.")
 	color.Red("------------------")
 
