@@ -85,10 +85,12 @@ func pizzaHut(pizzaMaker *Producer) {
 
 		if currentPizza != nil {
 			i = currentPizza.pizzaNumber
-			select {
-			case pizzaMaker.data <- *currentPizza: // Note: If currentPizza send it to pizzaMaker
 
-			case quitChan := <-pizzaMaker.quit: // Note: If pizzaMaker.quit assign it to quitChan
+			// Important: Seelect executes a single channel among the multiple alternatives. Based on the availability of channel operations, the select statement executes a channel from the multiple alternatives. If multiple channels are ready for execution, the select statement selects and executes a channel randomly.
+			select {
+			case pizzaMaker.data <- *currentPizza: // Note: Send currentPizza to pizzaMaker.data channel
+
+			case quitChan := <-pizzaMaker.quit: // Note: Assign pizzaMaker.quit channel's value to quitCHan
 				close(pizzaMaker.data)
 				close(quitChan)
 				return
@@ -108,7 +110,9 @@ func main() {
 
 	go pizzaHut(pizzaJob)
 
-	for i := range pizzaJob.data {
+	// fmt.Println(<-pizzaJob.data) // Note: Read data from channel it's like drinking water.
+
+	for i := range pizzaJob.data { // Note: Immediately reading from channel and assigning it to i.
 		if i.pizzaNumber <= numberOfPizzas {
 			if i.success {
 				color.Green(i.message)
