@@ -12,7 +12,7 @@ const HUNGER = 3
 var philosophers = []string{"Plato", "Socrates", "Aristotle", "Pascal", "Locke"}
 var wg sync.WaitGroup
 var sleepTime = time.Second * 1
-var eatTime = time.Second * 2
+var eatTime = time.Second * 1
 var thinkTime = time.Second * 1
 var orderFinished []string
 var orderMutex sync.Mutex
@@ -64,6 +64,7 @@ func main() {
 
 	for i := 0; i < len(philosophers); i++ {
 		forkRight := &sync.Mutex{}
+
 		go diningProblem(philosophers[i], forkLeft, forkRight)
 		forkLeft = forkRight
 	}
@@ -71,5 +72,5 @@ func main() {
 
 	fmt.Println("The table is empty.")
 
-	fmt.Printf("Order finished: %s\n", strings.Join(orderFinished, ","))
+	fmt.Printf("Order finished: %s\n", strings.Join(orderFinished, ", "))
 }
