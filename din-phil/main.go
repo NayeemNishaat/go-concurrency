@@ -11,7 +11,8 @@ const HUNGER = 3
 var philosophers = []string{"Plato", "Socrates", "Aristotle", "Pascal", "Locke"}
 var wg sync.WaitGroup
 var sleepTime = time.Second * 1
-var eatTime = time.Second * 3
+var eatTime = time.Second * 2
+var thinkTime = time.Second * 1
 
 func diningProblem(philosopher string, leftFork, rightFork *sync.Mutex) {
 	defer wg.Done()
@@ -24,18 +25,21 @@ func diningProblem(philosopher string, leftFork, rightFork *sync.Mutex) {
 		time.Sleep(sleepTime)
 
 		leftFork.Lock()
-		fmt.Printf("\t%s picked up the fork to his left.", philosopher)
+		fmt.Printf("\t%s picked up the fork to his left.\n", philosopher)
 
 		rightFork.Lock()
-		fmt.Printf("\t%s picked up the fork to his right.", philosopher)
+		fmt.Printf("\t%s picked up the fork to his right.\n", philosopher)
 
 		fmt.Println(philosopher, "has both forks and is eating.")
 		time.Sleep(eatTime)
 
+		fmt.Println(philosopher, "is thinking!")
+		time.Sleep(thinkTime)
+
 		rightFork.Unlock()
-		fmt.Printf("\t%s put down the fork on his right", philosopher)
+		fmt.Printf("\t%s put down the fork on his right\n", philosopher)
 		leftFork.Unlock()
-		fmt.Printf("\t%s put down the fork on his left", philosopher)
+		fmt.Printf("\t%s put down the fork on his left\n", philosopher)
 		time.Sleep(sleepTime)
 	}
 
