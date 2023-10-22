@@ -2,45 +2,44 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"time"
 )
 
-func shout(ping <-chan string, pong chan<- string) { // Note: Receive/Send only ping channel
+func server1(ch chan string) {
 	for {
-		s, ok := <-ping
+		time.Sleep(5 * time.Second)
+		ch <- "From server 1."
+	}
+}
 
-		if !ok {
-			fmt.Println("Something went wring!")
-		}
-
-		// pong <- <-ping
-		pong <- fmt.Sprintf("%s!!!", strings.ToUpper(s))
+func server2(ch chan string) {
+	for {
+		time.Sleep(2 * time.Second)
+		ch <- "From server 2."
 	}
 }
 
 func main() {
-	ping := make(chan string)
-	pong := make(chan string)
+	fmt.Println("Select with channels.")
 
-	go shout(ping, pong)
+	channel1 := make(chan string)
+	channel2 := make(chan string)
 
-	// time.Sleep(10 * time.Second) // Note: Now the go routine will last 10s cause after 10s main go routine will end for
+	go server1(channel1)
+	go server2(channel2)
 
 	for {
-		fmt.Print("> ")
-		var userInput string
-
-		fmt.Scanln(&userInput)
-
-		if userInput == strings.ToLower("q") {
-			break
+		select {
+		case s1 := <-channel1:
+			fmt.Println("Case 1:", s1)
+		case s2 := <-channel1: // Note: If multiple cases of listening from same channel go will choose one randomly
+			fmt.Println("Case 2:", s2)
+		case s3 := <-channel2:
+			fmt.Println("Case 3:", s3)
+		case s4 := <-channel2:
+			fmt.Println("Case 4:", s4)
+			// default:
+			// Remark: Avoid Deadlock
 		}
-
-		ping <- userInput
-		response := <-pong
-		fmt.Println(response)
 	}
-
-	close(ping)
-	close(pong)
 }
