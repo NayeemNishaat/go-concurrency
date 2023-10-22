@@ -7,7 +7,11 @@ import (
 
 func shout(ping <-chan string, pong chan<- string) { // Note: Receive/Send only ping channel
 	for {
-		s := <-ping
+		s, ok := <-ping
+
+		if !ok {
+			fmt.Println("Something went wring!")
+		}
 
 		// pong <- <-ping
 		pong <- fmt.Sprintf("%s!!!", strings.ToUpper(s))
