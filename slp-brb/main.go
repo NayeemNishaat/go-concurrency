@@ -1,30 +1,45 @@
 package main
 
 import (
-	"fmt"
+	"hash/maphash"
+	"math/rand"
 	"time"
+
+	"github.com/fatih/color"
 )
 
-func listen(ch chan int) {
-	for { // Important: If infinite for loop is not used then this go routine dies after it reaches to the end of function. An infinite for loop makes the go routine to loop again, wait for input from channel.
-		i := <-ch
-		fmt.Println("Got", i)
-
-		time.Sleep(1 * time.Second)
-	}
-}
+var seatingCapacity = 10
+var arrivalRate = 100
+var cutDuration = 1000 * time.Microsecond
+var timeOpen = 10 * time.Second
+var r = rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64())))
 
 func main() {
-	ch := make(chan int, 10) // Note: Now channel capacity is 10 by default 1.
+	color.Yellow("The Sleeping Burber")
 
-	go listen(ch)
+	clientChan := make(chan string, seatingCapacity)
+	doneChan := make(chan bool)
 
-	for i := 0; i < 100; i++ {
-		fmt.Println("Sending", i)
-		ch <- i
-		fmt.Println("Sent", i)
+	shop := BarberShop{
+		ShopCapacity:    seatingCapacity,
+		HaircutDuration: cutDuration,
+		NumberOfBurbers: 0,
+		BurbersDoneChan: doneChan,
+		ClientsChan:     clientChan,
+		Open:            true,
 	}
+	color.Green("Shop is open.")
 
-	fmt.Println("Done")
-	close(ch)
+	shop.addburber("Frank")
+
+	shopClosing := make(chan bool)
+	closed := make(chan bool)
+	go func() {
+		<-time.After(timeOpen) // Note: Keep the channel open for the specified time
+		shopClosing <- true
+		shop.closeShopForDay()
+		closed <- true
+	}()
+
+	// time.Sleep(time.Second * 5)
 }
