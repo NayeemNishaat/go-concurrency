@@ -24,7 +24,7 @@ func (shop *BarberShop) addburber(barber string) {
 
 		for {
 			if len(shop.ClientsChan) == 0 {
-				color.Cyan("Nothing to do, so %s takes a nap.", barber)
+				color.Magenta("Nothing to do, so %s takes a nap.", barber)
 				isSleeping = true
 			}
 
@@ -68,4 +68,19 @@ func (shop *BarberShop) closeShopForDay() {
 	close(shop.BurbersDoneChan)
 
 	color.Green("The shop is closed for the day and everyone has gone home.")
+}
+
+func (shop *BarberShop) addClient(client string) {
+	color.Yellow("%s arrives for a hair cut.", client)
+
+	if shop.Open { // Important: This is not race because we are not spawning multiple go routines/we don't have multiple go routines here.
+		select {
+		case shop.ClientsChan <- client:
+			color.Yellow("%s takes a seat in the waiting room.", client)
+		default:
+			color.Red("The waiting room is full, so %s leaves.", client)
+		}
+	} else {
+		color.Red("The shop is already closed, so %s leaves.", client)
+	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"hash/maphash"
 	"math/rand"
 	"time"
@@ -9,13 +10,13 @@ import (
 )
 
 var seatingCapacity = 10
-var arrivalRate = 100
-var cutDuration = 1000 * time.Microsecond
+var arrivalRate = 500
+var cutDuration = 1000 * time.Millisecond
 var timeOpen = 10 * time.Second
 var r = rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64())))
 
 func main() {
-	color.Yellow("The Sleeping Burber")
+	color.Cyan("The Sleeping Burber")
 
 	clientChan := make(chan string, seatingCapacity)
 	doneChan := make(chan bool)
@@ -31,15 +32,33 @@ func main() {
 	color.Green("Shop is open.")
 
 	shop.addburber("Frank")
+	shop.addburber("Susi")
 
 	shopClosing := make(chan bool)
 	closed := make(chan bool)
 	go func() {
-		<-time.After(timeOpen) // Note: Keep the channel open for the specified time
+		<-time.After(timeOpen) // Note: Keep the current go routine alive open for the specified time
 		shopClosing <- true
 		shop.closeShopForDay()
 		closed <- true
 	}()
 
+	i := 0
+
+	go func() {
+		for {
+			randomMilleSeconds := r.Int() % (2 * arrivalRate)
+
+			select {
+			case <-shopClosing:
+				return
+			case <-time.After(time.Millisecond * time.Duration(randomMilleSeconds)):
+				shop.addClient(fmt.Sprintf("Client-%d", i))
+				i++
+			}
+		}
+	}()
+
 	// time.Sleep(time.Second * 5)
+	<-closed
 }
