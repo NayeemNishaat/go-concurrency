@@ -1,11 +1,11 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 )
 
@@ -14,10 +14,10 @@ var envFile map[string]string
 func main() {
 	envFile, _ = godotenv.Read(".env")
 	db := initDB()
-	db.Ping()
+	db.Ping(context.Background())
 }
 
-func initDB() *sql.DB {
+func initDB() *pgx.Conn {
 	conn := connectToDB()
 
 	if conn == nil {
@@ -27,7 +27,7 @@ func initDB() *sql.DB {
 	return conn
 }
 
-func connectToDB() *sql.DB {
+func connectToDB() *pgx.Conn {
 	count := 0
 
 	dsn := envFile["DSN"]
@@ -54,18 +54,21 @@ func connectToDB() *sql.DB {
 	}
 }
 
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", dsn)
+func openDB(dsn string) (*pgx.Conn, error) {
+	// db, err := sql.Open("pgx", dsn)
+	db, err := pgx.Connect(context.Background(), dsn)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.Ping()
+	err = db.Ping(context.Background())
 
 	if err != nil {
 		return nil, err
 	}
+
+	defer db.Close(context.Background())
 
 	return db, nil
 }
