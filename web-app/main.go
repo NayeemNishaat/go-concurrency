@@ -5,16 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 )
 
-var env map[string]string
-
 func main() {
-	env, _ = godotenv.Read(".env")
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	db := initDB()
 	db.Ping(context.Background())
 
@@ -34,7 +38,7 @@ func initDB() *pgx.Conn {
 func connectToDB() *pgx.Conn {
 	count := 0
 
-	dsn := env["DSN"]
+	dsn := os.Getenv("DSN")
 
 	for {
 		conn, err := openDB(dsn)
@@ -78,14 +82,11 @@ func openDB(dsn string) (*pgx.Conn, error) {
 }
 
 func server() {
-	r := &Router{}
+	mux := http.NewServeMux()
 
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", env["PORT"]),
-		Handler: r,
-	}
+	mux.HandleFunc("/", Chain(Hello, Method("GET"), Logging()))
 
-	err := srv.ListenAndServe()
+	err := http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), mux)
 
 	if err != nil {
 		log.Panic(err)
