@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"web/route"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
@@ -83,8 +84,7 @@ func openDB(dsn string) (*pgx.Conn, error) {
 
 func server() {
 	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", Chain(Hello, Method("GET"), Logging()))
+	route.InitRouter(mux)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), mux)
 
