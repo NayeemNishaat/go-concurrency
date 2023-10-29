@@ -2,19 +2,23 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 )
 
-var envFile map[string]string
+var env map[string]string
 
 func main() {
-	envFile, _ = godotenv.Read(".env")
+	env, _ = godotenv.Read(".env")
 	db := initDB()
 	db.Ping(context.Background())
+
+	server()
 }
 
 func initDB() *pgx.Conn {
@@ -30,7 +34,7 @@ func initDB() *pgx.Conn {
 func connectToDB() *pgx.Conn {
 	count := 0
 
-	dsn := envFile["DSN"]
+	dsn := env["DSN"]
 
 	for {
 		conn, err := openDB(dsn)
@@ -73,5 +77,19 @@ func openDB(dsn string) (*pgx.Conn, error) {
 	return db, nil
 }
 
-// brew services start postgresql@16
+func server() {
+	r := &Router{}
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", env["PORT"]),
+		Handler: r,
+	}
+
+	err := srv.ListenAndServe()
+
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
 // /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
