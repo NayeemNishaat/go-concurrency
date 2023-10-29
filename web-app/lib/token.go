@@ -64,6 +64,7 @@ func TokenValid(r *http.Request) error {
 func ExtractToken(r *http.Request) string {
 	token := r.URL.Query()
 	fmt.Println(token)
+
 	// if token != "" {
 	// 	return token
 	// }
