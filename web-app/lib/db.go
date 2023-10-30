@@ -47,7 +47,6 @@ func connectToDB() *pgx.Conn {
 }
 
 func openDB(dsn string) (*pgx.Conn, error) {
-	// db, err := sql.Open("pgx", dsn)
 	db, err := pgx.Connect(context.Background(), dsn)
 
 	if err != nil {

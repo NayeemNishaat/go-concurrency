@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"web/lib"
+	"web/middleware"
 	"web/route"
 
 	"github.com/joho/godotenv"
@@ -27,6 +28,8 @@ func main() {
 
 func server() {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", middleware.Logging()(func(w http.ResponseWriter, r *http.Request) {}))
+	// mux.HandleFunc("", middleware.Logging()())
 	route.InitRouter(mux)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), mux)

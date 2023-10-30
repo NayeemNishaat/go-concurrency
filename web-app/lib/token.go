@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -29,45 +27,13 @@ func GenerateToken(userId uint) (string, error) {
 	return token.SignedString([]byte(os.Getenv("API_SECRET")))
 }
 
-func TokenValid(r *http.Request) error {
-	tokenString := ExtractToken(r)
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(os.Getenv("API_SECRET")), nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-
-	if ok && token.Valid {
-		uId, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["userId"]), 10, 32)
-
-		if err != nil {
-			return err
-		}
-
-		ctx := context.WithValue(r.Context(), "userId", uId)
-		r = r.WithContext(ctx)
-		return nil
-	}
-
-	return errors.New("invalid claim")
-}
-
 func ExtractToken(r *http.Request) string {
-	token := r.URL.Query()
-	fmt.Println(token)
+	query := r.URL.Query()
+	token := query["token"]
 
-	// if token != "" {
-	// 	return token
-	// }
+	if len(token) != 0 && token[0] != "" {
+		return token[0]
+	}
 
 	bearerToken := r.Header.Get("Authorization")
 

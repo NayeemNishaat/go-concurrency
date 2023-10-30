@@ -7,5 +7,5 @@ import (
 )
 
 func HelloRoute(m *http.ServeMux) {
-	m.HandleFunc("/", middleware.Chain(controller.Hello, middleware.Method("GET"), middleware.Logging()))
+	m.HandleFunc("/hello", middleware.Chain(controller.Hello, middleware.Method("GET"), middleware.Token()))
 }
