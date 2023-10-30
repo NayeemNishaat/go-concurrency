@@ -6,7 +6,8 @@ import (
 )
 
 // Chain applies middlewares to a http.HandlerFunc
-func Chain(f http.HandlerFunc, middlewares ...Middleware) http.HandlerFunc {
+func Chain(f http.HandlerFunc, globalMiddlewars []Middleware, middlewares ...Middleware) http.HandlerFunc {
+	middlewares = append(globalMiddlewars, middlewares...)
 	slices.Reverse[[]Middleware](middlewares)
 
 	for _, m := range middlewares {
