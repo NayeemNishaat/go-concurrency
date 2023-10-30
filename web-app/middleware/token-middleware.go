@@ -50,9 +50,9 @@ func Token() Middleware {
 				r = r.WithContext(ctx)
 
 				f(w, r)
+			} else {
+				fmt.Fprintln(w, "Unauthorized")
 			}
-
-			fmt.Fprintln(w, "Unauthorized")
 		}
 	}
 }
