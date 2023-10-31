@@ -16,7 +16,7 @@ import (
 // const userId userIdT = userIdT("userId")
 // const userId = userIdT("userId")
 
-type userId struct{}
+type UserId struct{}
 
 func Token() Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {
@@ -46,7 +46,7 @@ func Token() Middleware {
 					return
 				}
 
-				ctx := context.WithValue(r.Context(), userId{}, uId)
+				ctx := context.WithValue(r.Context(), UserId{}, uId) // TODO: Add more user info.
 				r = r.WithContext(ctx)
 
 				f(w, r)

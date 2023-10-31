@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
+	"web/templates"
 )
 
-func Hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "hello world")
+func HomePage(w http.ResponseWriter, r *http.Request) {
+	templates.Render(w, r, "home.page.gohtml", nil)
+	// fmt.Fprintln(w, "hello world")
 }
 
 // token, err := lib.GenerateToken(0)
