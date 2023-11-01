@@ -58,9 +58,9 @@ func Render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) 
 }
 
 func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
-	td.Flash = "This Is Flash"
-	td.Warning = "This Is Warning"
-	td.Error = "This Is Error"
+	td.Flash = ""
+	td.Warning = ""
+	td.Error = ""
 
 	_, ok := r.Context().Value(middleware.UserId{}).(int)
 	if ok {
