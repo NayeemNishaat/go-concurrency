@@ -6,8 +6,13 @@ import (
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
+	// Handle unrecognized routes
+	if r.URL.Path != "/" {
+		http.Redirect(w, r, "/404", http.StatusPermanentRedirect)
+		return
+	}
+
 	templates.Render(w, r, "home.page.gohtml", nil)
-	// fmt.Fprintln(w, "hello world")
 }
 
 // token, err := lib.GenerateToken(0)

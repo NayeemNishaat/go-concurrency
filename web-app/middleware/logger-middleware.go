@@ -19,12 +19,6 @@ func Logging() Middleware {
 			start := time.Now()
 			defer func() { log.Println(r.URL.Path, time.Since(start)) }()
 
-			// Handle unrecognized routes
-			if r.URL.Path != "/" {
-				http.Redirect(w, r, "/404", http.StatusPermanentRedirect)
-				return
-			}
-
 			// Call the next middleware/handler in chain
 			f(w, r)
 		}
