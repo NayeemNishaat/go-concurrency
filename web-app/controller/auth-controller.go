@@ -2,7 +2,7 @@ package controller
 
 import (
 	"net/http"
-	"web/templates"
+	"web/template"
 )
 
 func RegisterMethodManager(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +45,7 @@ func LoginMethodManager(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterPage(w http.ResponseWriter, r *http.Request) {
-	templates.Render(w, r, "register.page.gohtml", nil)
+	template.Render(w, r, "register.page.gohtml", nil)
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginPage(w http.ResponseWriter, r *http.Request) {
-	templates.Render(w, r, "login.page.gohtml", nil)
+	template.Render(w, r, "login.page.gohtml", nil)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {

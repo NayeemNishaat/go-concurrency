@@ -1,4 +1,4 @@
-package templates
+package template
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"web/middleware"
 )
 
-var pathToTemplates = "./templates"
+var pathToTemplates = "./template"
 
 type TemplateData struct {
 	StringMap     map[string]string

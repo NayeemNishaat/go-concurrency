@@ -2,7 +2,7 @@ package controller
 
 import (
 	"net/http"
-	"web/templates"
+	"web/template"
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -12,7 +12,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templates.Render(w, r, "home.page.gohtml", nil)
+	template.Render(w, r, "home.page.gohtml", nil)
 }
 
 // token, err := lib.GenerateToken(0)
