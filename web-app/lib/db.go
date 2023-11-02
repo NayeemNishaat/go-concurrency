@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func InitDB() *pgx.Conn {
+func InitDB() *pgxpool.Pool {
 	conn := connectToDB()
 
 	if conn == nil {
@@ -19,7 +19,7 @@ func InitDB() *pgx.Conn {
 	return conn
 }
 
-func connectToDB() *pgx.Conn {
+func connectToDB() *pgxpool.Pool {
 	count := 0
 
 	dsn := os.Getenv("DSN")
@@ -46,8 +46,8 @@ func connectToDB() *pgx.Conn {
 	}
 }
 
-func openDB(dsn string) (*pgx.Conn, error) {
-	db, err := pgx.Connect(context.Background(), dsn)
+func openDB(dsn string) (*pgxpool.Pool, error) {
+	db, err := pgxpool.New(context.Background(), dsn)
 
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func openDB(dsn string) (*pgx.Conn, error) {
 		return nil, err
 	}
 
-	defer db.Close(context.Background())
+	defer db.Close()
 
 	return db, nil
 }
