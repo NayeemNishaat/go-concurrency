@@ -6,11 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 	"web/lib"
 	"web/route"
 
 	"github.com/joho/godotenv"
 )
+
+var wg sync.WaitGroup
 
 func main() {
 	err := godotenv.Load(".env")
@@ -22,6 +27,7 @@ func main() {
 	db := lib.InitDB()
 	db.Ping(context.Background())
 
+	go gracefulShutdown()
 	server()
 }
 
@@ -34,6 +40,23 @@ func server() {
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func gracefulShutdown() {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit // Note: Waiting for interrupt signal
+
+	shutdown()
+	os.Exit(0)
+}
+
+func shutdown() {
+	log.Println("Perform Cleanup")
+
+	wg.Wait() // Note: Block until wg is empty -> 0
+
+	log.Println("Cleaning up and shutting down app.")
 }
 
 // /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
