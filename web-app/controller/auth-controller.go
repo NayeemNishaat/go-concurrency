@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"web/lib"
@@ -108,7 +108,8 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json, err := json.Marshal(struct {
+	// Note: Preparing And Sending JSON
+	/* json, err := json.Marshal(struct {
 		Token string `json:"token"`
 	}{Token: token})
 
@@ -122,13 +123,12 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(json)
+	w.Write(json) */
 
 	ctx := context.WithValue(r.Context(), lib.Flash{}, "Login Success!")
 	r = r.WithContext(ctx)
 
-	// http.Redirect(w, r, "/", http.StatusSeeOther)
-	template.Render(w, r, "home.page.gohtml", nil)
+	http.Redirect(w, r, fmt.Sprintf("/?token=%s", token), http.StatusSeeOther)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
