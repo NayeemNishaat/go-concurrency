@@ -1,7 +1,11 @@
 package controller
 
 import (
+	"context"
+	"encoding/json"
+	"log"
 	"net/http"
+	"web/lib"
 	"web/template"
 )
 
@@ -31,7 +35,7 @@ func LoginMethodManager(w http.ResponseWriter, r *http.Request) {
 		// middleware.Chain(LoginPage, []middleware.Middleware{middleware.Logging()}).ServeHTTP(w, r)
 		return
 	case http.MethodPost:
-		Login(w, r)
+		Cfg.Login(w, r)
 		return
 	case http.MethodPut:
 		// Update an existing record.
@@ -56,8 +60,75 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	template.Render(w, r, "login.page.gohtml", nil)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	//
+func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	user, err := cfg.Models.User.GetByEmail(email)
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	validPassword, err := user.PasswordMatches(password)
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	if !validPassword {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	token, err := lib.GenerateToken(uint(user.ID))
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	json, err := json.Marshal(struct {
+		Token string `json:"token"`
+	}{Token: token})
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(json)
+
+	ctx := context.WithValue(r.Context(), lib.Flash{}, "Login Success!")
+	r = r.WithContext(ctx)
+
+	// http.Redirect(w, r, "/", http.StatusSeeOther)
+	template.Render(w, r, "home.page.gohtml", nil)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {

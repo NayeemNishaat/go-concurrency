@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"web/middleware"
+	"web/lib"
 )
 
 var pathToTemplates = "./template"
@@ -60,9 +60,29 @@ func Render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) 
 func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 	td.Flash = ""
 	td.Warning = ""
-	td.Error = ""
 
-	_, ok := r.Context().Value(middleware.UserId{}).(int)
+	v, ok := r.Context().Value(lib.Flash{}).(string)
+	if ok {
+		td.Flash = v
+	} else {
+		td.Flash = ""
+	}
+
+	v, ok = r.Context().Value(lib.Warning{}).(string)
+	if ok {
+		td.Warning = v
+	} else {
+		td.Warning = ""
+	}
+
+	v, ok = r.Context().Value(lib.Error{}).(string)
+	if ok {
+		td.Error = v
+	} else {
+		td.Error = ""
+	}
+
+	_, ok = r.Context().Value(lib.UserId{}).(int)
 	if ok {
 		td.Authenticated = true
 	} else {

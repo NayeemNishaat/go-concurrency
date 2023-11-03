@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +8,9 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"web/controller"
 	"web/lib"
+	"web/model"
 	"web/route"
 
 	"github.com/joho/godotenv"
@@ -25,7 +26,13 @@ func main() {
 	}
 
 	db := lib.InitDB()
-	db.Ping(context.Background())
+	// db.Ping(context.Background())
+
+	cfg := controller.Config{
+		Wg:     &wg,
+		Models: model.New(db),
+	}
+	controller.InitCfg(&cfg)
 
 	go gracefulShutdown()
 	server()

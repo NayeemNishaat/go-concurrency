@@ -11,13 +11,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// type userIdT string
-// const userId userIdT = "userId"
-// const userId userIdT = userIdT("userId")
-// const userId = userIdT("userId")
-
-type UserId struct{}
-
 func Token() Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +39,7 @@ func Token() Middleware {
 					return
 				}
 
-				ctx := context.WithValue(r.Context(), UserId{}, uId) // TODO: Add more user info.
+				ctx := context.WithValue(r.Context(), lib.UserId{}, uId) // TODO: Add more user info.
 				r = r.WithContext(ctx)
 
 				f(w, r)
@@ -56,5 +49,3 @@ func Token() Middleware {
 		}
 	}
 }
-
-// xxx.Context().Value(RequestIDKey{}).(string)
