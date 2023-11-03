@@ -13,10 +13,12 @@ import (
 	"web/model"
 	"web/route"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
 var wg sync.WaitGroup
+var db *pgxpool.Pool
 
 func main() {
 	err := godotenv.Load(".env")
@@ -25,8 +27,7 @@ func main() {
 		log.Fatalf("Error loading .env file")
 	}
 
-	db := lib.InitDB()
-	// db.Ping(context.Background())
+	db = lib.InitDB()
 
 	cfg := controller.Config{
 		Wg:     &wg,
@@ -59,8 +60,9 @@ func gracefulShutdown() {
 }
 
 func shutdown() {
-	log.Println("Perform Cleanup")
+	log.Println("Performing Cleanup")
 
+	defer db.Close()
 	wg.Wait() // Note: Block until wg is empty -> 0
 
 	log.Println("Cleaning up and shutting down app.")

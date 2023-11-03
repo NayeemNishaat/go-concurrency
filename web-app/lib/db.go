@@ -59,7 +59,5 @@ func openDB(dsn string) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	defer db.Close()
-
 	return db, nil
 }
