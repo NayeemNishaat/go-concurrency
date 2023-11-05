@@ -125,9 +125,6 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(json) */
 
-	ctx := context.WithValue(r.Context(), lib.Flash{}, "Login Success!")
-	r = r.WithContext(ctx)
-
 	http.Redirect(w, r, fmt.Sprintf("/?token=%s", token), http.StatusSeeOther)
 }
 

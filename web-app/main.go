@@ -40,8 +40,11 @@ func main() {
 }
 
 func server() {
-	http.Handle("/js/", http.FileServer(http.Dir("public/")))
 	mux := http.NewServeMux()
+
+	// Note: Serving Public Dir
+	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./public")))) // Important: If a trailing / is given then all the request with prefix "public" will be handled by this handler.
+
 	route.InitRouter(mux)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), mux)
