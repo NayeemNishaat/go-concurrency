@@ -125,7 +125,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(json) */
 
-	http.Redirect(w, r, fmt.Sprintf("/?token=%s", token), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/welcome?token=%s", token), http.StatusSeeOther)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {

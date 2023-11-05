@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"context"
 	"net/http"
-	"web/lib"
 	"web/template"
 )
 
@@ -29,12 +27,12 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := r.URL.Query().Get("token")
+	// token := r.URL.Query().Get("token")
 
-	if token != "" {
-		ctx := context.WithValue(r.Context(), lib.Flash{}, "Login Success!")
-		r = r.WithContext(ctx)
-	}
+	// if token != "" {
+	// 	ctx := context.WithValue(r.Context(), lib.Flash{}, "Login Success!")
+	// 	r = r.WithContext(ctx)
+	// }
 
 	template.Render(w, r, "home.page.gohtml", nil)
 	// fmt.Fprintln(w, "Something went wrong!")

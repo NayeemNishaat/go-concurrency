@@ -82,7 +82,8 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 		td.Error = ""
 	}
 
-	_, ok = r.Context().Value(lib.UserId{}).(int)
+	_, ok = r.Context().Value(lib.UserId{}).(uint64)
+
 	if ok {
 		td.Authenticated = true
 	} else {
