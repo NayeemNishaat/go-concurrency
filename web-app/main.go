@@ -40,6 +40,7 @@ func main() {
 }
 
 func server() {
+	http.Handle("/js/", http.FileServer(http.Dir("public/")))
 	mux := http.NewServeMux()
 	route.InitRouter(mux)
 
@@ -69,3 +70,6 @@ func shutdown() {
 }
 
 // /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
+
+// TODO:
+// Add JS to show login success toast after successful login

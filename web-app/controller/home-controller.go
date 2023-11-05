@@ -2,24 +2,17 @@ package controller
 
 import (
 	"net/http"
+	"regexp"
 	"web/template"
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
-	// Handle unrecognized routes
-	if r.URL.Path != "/" {
+	// Note: Handle unrecognized routes
+	re := regexp.MustCompile("/js/*")
+	if r.URL.Path != "/" && !re.Match([]byte(r.URL.Path)) {
 		http.Redirect(w, r, "/404", http.StatusPermanentRedirect)
 		return
 	}
-
+	// fmt.Fprintln(w, "Something went wrong!")
 	template.Render(w, r, "home.page.gohtml", nil)
 }
-
-// token, err := lib.GenerateToken(0)
-
-// if err != nil {
-// 	fmt.Fprintln(w, "Something went wrong!")
-// 	return
-// }
-
-// fmt.Fprintln(w, token)
