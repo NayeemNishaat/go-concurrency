@@ -42,6 +42,11 @@ func main() {
 func server() {
 	mux := http.NewServeMux()
 
+	// Note: Serve Favicon
+	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./public/img/favicon.ico")
+	})
+
 	// Note: Serving Public Dir
 	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./public")))) // Important: If a trailing / is given then all the request with prefix "public" will be handled by this handler.
 
