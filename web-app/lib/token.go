@@ -29,16 +29,22 @@ func GenerateToken(userId uint) (string, error) {
 
 func ExtractToken(r *http.Request) string {
 	query := r.URL.Query()
-	token := query["token"]
+	queryToken := query["token"]
 
-	if len(token) != 0 && token[0] != "" {
-		return token[0]
+	if len(queryToken) != 0 && queryToken[0] != "" {
+		return queryToken[0]
 	}
 
 	bearerToken := r.Header.Get("Authorization")
 
 	if len(strings.Split(bearerToken, " ")) == 2 {
 		return strings.Split(bearerToken, " ")[1]
+	}
+
+	headerToken, err := r.Cookie("token")
+
+	if err == nil {
+		return headerToken.Value
 	}
 
 	return ""

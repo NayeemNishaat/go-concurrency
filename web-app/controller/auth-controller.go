@@ -2,9 +2,11 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
+	"time"
 	"web/lib"
 	"web/template"
 )
@@ -125,7 +127,32 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(json) */
 
-	http.Redirect(w, r, fmt.Sprintf("/welcome?token=%s", token), http.StatusSeeOther)
+	expires := time.Now().AddDate(0, 0, 1)
+	secure, err := strconv.ParseBool(os.Getenv("SECURE_COOKIE"))
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	ck := http.Cookie{
+		Name:     "token",
+		Domain:   "localhost",
+		Path:     "/",
+		Secure:   secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Value:    token,
+		MaxAge:   90000,
+		Expires:  expires,
+	}
+	http.SetCookie(w, &ck)
+
+	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
+	// http.Redirect(w, r, fmt.Sprintf("/welcome?token=%s", token), http.StatusSeeOther)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
