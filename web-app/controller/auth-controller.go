@@ -129,5 +129,5 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	//
+	http.Redirect(w, r, "/login", http.StatusPermanentRedirect)
 }
