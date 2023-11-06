@@ -16,7 +16,7 @@ func Token(allow bool) Middleware {
 		return func(w http.ResponseWriter, r *http.Request) {
 			tokenString := lib.ExtractToken(r)
 
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
@@ -38,7 +38,8 @@ func Token(allow bool) Middleware {
 			claims, ok := token.Claims.(jwt.MapClaims)
 
 			if ok && token.Valid {
-				uId, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["userId"]), 10, 32)
+				// fmt.Sprintf("%v", claims["userId"])
+				uId, err := strconv.ParseUint(fmt.Sprintf("%.f", claims["userId"]), 10, 32)
 
 				if err != nil {
 					if allow {
