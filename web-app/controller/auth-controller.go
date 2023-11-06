@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -138,9 +139,10 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	maxAge, err := strconv.ParseUint(os.Getenv("COOKIE_MAX_AGE"), 10, 16)
+	maxAge, err := strconv.ParseUint(os.Getenv("COOKIE_MAX_AGE"), 10, 32)
 
 	if err != nil {
+		fmt.Println(err)
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
 		r = r.WithContext(ctx)
 

@@ -41,10 +41,10 @@ func ExtractToken(r *http.Request) string {
 		return strings.Split(bearerToken, " ")[1]
 	}
 
-	headerToken, err := r.Cookie("token")
+	cookieToken, err := r.Cookie("token")
 
 	if err == nil {
-		return headerToken.Value
+		return cookieToken.Value
 	}
 
 	return ""

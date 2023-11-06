@@ -11,5 +11,5 @@ func AuthRoute(m *http.ServeMux, globalMiddlewars ...middleware.Middleware) {
 
 	m.HandleFunc("/login", middleware.Chain(controller.LoginMethodManager, globalMiddlewars))
 
-	m.HandleFunc("/logout", middleware.Chain(controller.Logout, globalMiddlewars, middleware.Method("GET"), middleware.Token(false)))
+	m.HandleFunc("/logout", middleware.Chain(controller.Logout, globalMiddlewars, middleware.Method("GET"), middleware.Csrf(), middleware.Token(false)))
 }

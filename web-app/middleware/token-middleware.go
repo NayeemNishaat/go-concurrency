@@ -30,6 +30,7 @@ func Token(allow bool) Middleware {
 					return
 				}
 
+				w.WriteHeader(http.StatusUnauthorized)
 				fmt.Fprintln(w, "Unauthorized")
 				return
 			}
@@ -45,6 +46,7 @@ func Token(allow bool) Middleware {
 						return
 					}
 
+					w.WriteHeader(http.StatusUnauthorized)
 					fmt.Fprintln(w, "Unauthorized")
 					return
 				}
@@ -59,6 +61,7 @@ func Token(allow bool) Middleware {
 					return
 				}
 
+				w.WriteHeader(http.StatusUnauthorized)
 				fmt.Fprintln(w, "Unauthorized")
 			}
 		}

@@ -12,7 +12,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	// file, err := os.ReadFile("." + r.URL.Path)
 	// if err != nil {
 	// 	fmt.Println(err)
-	// 	http.Redirect(w, r, "/500", http.StatusPermanentRedirect)
+	// 	http.Redirect(w, r, "/500", http.StatusInternalServerError)
 	// 	return
 	// }
 

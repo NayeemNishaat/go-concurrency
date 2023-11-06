@@ -21,6 +21,7 @@ type TemplateData struct {
 	Error         string
 	Authenticated bool
 	Now           time.Time
+	CsrfToken     string
 	// User          *data.User
 }
 
