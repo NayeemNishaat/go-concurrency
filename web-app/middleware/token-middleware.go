@@ -11,7 +11,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func Token() Middleware {
+func Token(allow bool) Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			tokenString := lib.ExtractToken(r)
@@ -25,6 +25,11 @@ func Token() Middleware {
 			})
 
 			if err != nil {
+				if allow {
+					f(w, r)
+					return
+				}
+
 				fmt.Fprintln(w, "Unauthorized")
 				return
 			}
@@ -35,6 +40,11 @@ func Token() Middleware {
 				uId, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["userId"]), 10, 32)
 
 				if err != nil {
+					if allow {
+						f(w, r)
+						return
+					}
+
 					fmt.Fprintln(w, "Unauthorized")
 					return
 				}
@@ -44,6 +54,11 @@ func Token() Middleware {
 
 				f(w, r)
 			} else {
+				if allow {
+					f(w, r)
+					return
+				}
+
 				fmt.Fprintln(w, "Unauthorized")
 			}
 		}

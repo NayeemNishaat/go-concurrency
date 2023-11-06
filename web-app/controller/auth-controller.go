@@ -138,15 +138,25 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	maxAge, err := strconv.ParseUint(os.Getenv("COOKIE_MAX_AGE"), 10, 16)
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
 	ck := http.Cookie{
-		Name:     "token",
-		Domain:   "localhost",
+		Name:     os.Getenv("COOKIE_NAME"),
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
 		Path:     "/",
 		Secure:   secure,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Value:    token,
-		MaxAge:   90000,
+		MaxAge:   int(maxAge),
 		Expires:  expires,
 	}
 	http.SetCookie(w, &ck)
@@ -156,5 +166,28 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
+	expires := time.Now()
+	secure, err := strconv.ParseBool(os.Getenv("SECURE_COOKIE"))
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
+		r = r.WithContext(ctx)
+
+		template.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	ck := http.Cookie{
+		Name:     os.Getenv("COOKIE_NAME"),
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
+		Path:     "/",
+		Secure:   secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Value:    "",
+		MaxAge:   0,
+		Expires:  expires,
+	}
+	http.SetCookie(w, &ck)
 	http.Redirect(w, r, "/login", http.StatusPermanentRedirect)
 }
