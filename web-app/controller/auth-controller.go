@@ -161,8 +161,8 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &ck)
 
-	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
 	// http.Redirect(w, r, fmt.Sprintf("/welcome?token=%s", token), http.StatusSeeOther)
+	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
