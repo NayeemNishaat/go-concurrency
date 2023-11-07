@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 	"web/lib"
-	"web/template"
 )
 
 func RegisterMethodManager(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +51,7 @@ func LoginMethodManager(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterPage(w http.ResponseWriter, r *http.Request) {
-	template.Render(w, r, "register.page.gohtml", nil)
+	lib.Render(w, r, "register.page.gohtml", nil)
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +59,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginPage(w http.ResponseWriter, r *http.Request) {
-	template.Render(w, r, "login.page.gohtml", nil)
+	lib.Render(w, r, "login.page.gohtml", nil)
 }
 
 func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +78,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -89,7 +88,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -97,7 +96,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -107,7 +106,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -120,7 +119,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -135,7 +134,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -146,7 +145,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 
@@ -175,7 +174,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
 		r = r.WithContext(ctx)
 
-		template.Render(w, r, "login.page.gohtml", nil)
+		lib.Render(w, r, "login.page.gohtml", nil)
 		return
 	}
 

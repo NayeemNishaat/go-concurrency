@@ -1,4 +1,4 @@
-package template
+package lib
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"web/lib"
 )
 
 var pathToTemplates = "./template"
@@ -62,28 +61,28 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 	td.Flash = ""
 	td.Warning = ""
 
-	v, ok := r.Context().Value(lib.Flash{}).(string)
+	v, ok := r.Context().Value(Flash{}).(string)
 	if ok {
 		td.Flash = v
 	} else {
 		td.Flash = ""
 	}
 
-	v, ok = r.Context().Value(lib.Warning{}).(string)
+	v, ok = r.Context().Value(Warning{}).(string)
 	if ok {
 		td.Warning = v
 	} else {
 		td.Warning = ""
 	}
 
-	v, ok = r.Context().Value(lib.Error{}).(string)
+	v, ok = r.Context().Value(Error{}).(string)
 	if ok {
 		td.Error = v
 	} else {
 		td.Error = ""
 	}
 
-	_, ok = r.Context().Value(lib.UserId{}).(uint64)
+	_, ok = r.Context().Value(UserId{}).(uint64)
 
 	if ok {
 		td.Authenticated = true

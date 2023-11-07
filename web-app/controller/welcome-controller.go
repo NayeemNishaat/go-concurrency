@@ -2,7 +2,7 @@ package controller
 
 import (
 	"net/http"
-	"web/template"
+	"web/lib"
 )
 
 func WelcomePage(w http.ResponseWriter, r *http.Request) {
@@ -11,5 +11,5 @@ func WelcomePage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/500", http.StatusInternalServerError)
 	}
 
-	template.Render(w, r, "welcome.page.gohtml", &template.TemplateData{CsrfToken: token.Value})
+	lib.Render(w, r, "welcome.page.gohtml", &lib.TemplateData{CsrfToken: token.Value})
 }

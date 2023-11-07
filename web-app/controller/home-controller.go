@@ -2,7 +2,7 @@ package controller
 
 import (
 	"net/http"
-	"web/template"
+	"web/lib"
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +34,6 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	// 	r = r.WithContext(ctx)
 	// }
 
-	template.Render(w, r, "home.page.gohtml", nil)
+	lib.Render(w, r, "home.page.gohtml", nil)
 	// fmt.Fprintln(w, "Something went wrong!")
 }
