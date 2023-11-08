@@ -156,6 +156,7 @@ func (m *Message) ToBytes() []byte {
 }
 
 // Test:
+// https://app.debugmail.io/app/teams/laby/projects/test-KA
 /* m := lib.Mail{
 	Host:       "app.debugmail.io",
 	Port:       25,
