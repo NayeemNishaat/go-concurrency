@@ -13,12 +13,10 @@ import (
 )
 
 type Mail struct {
-	Domain     string
 	Host       string
 	Port       int
 	Username   string
 	Password   string
-	Encryption string
 	From       string
 	FromName   string
 	Wait       *sync.WaitGroup
@@ -36,13 +34,8 @@ type Message struct {
 	Subject     string
 	Body        string
 	Attachments map[string][]byte
-	Data        any
-	DataMap     map[string]any
+	Data        map[string]any
 	Template    string
-}
-
-type Sender struct {
-	auth smtp.Auth
 }
 
 func (m *Mail) SendMail(msg Message, errorChan chan error) {
@@ -58,17 +51,6 @@ func (m *Mail) SendMail(msg Message, errorChan chan error) {
 		msg.FromName = m.FromName
 	}
 
-	data := map[string]any{
-		"message": msg.Data,
-	}
-
-	msg.DataMap = data
-
-	// formatterMessage, err := m.buildPlainMessage(msg)
-	// if err != nil {
-	// 	errorChan <- err
-	// }
-
 	plainMessage, err := m.buildHTMLMessage(msg)
 	if err != nil {
 		errorChan <- err
@@ -77,10 +59,6 @@ func (m *Mail) SendMail(msg Message, errorChan chan error) {
 
 	m.send(&msg)
 }
-
-// func (m *Mail) buildPlainMessage(msg Message) (string, error) {
-// 	return "", nil
-// }
 
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	templateToRender := fmt.Sprintf("./template/%s.html.gohtml", msg.Template)
@@ -92,7 +70,7 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 
 	var tpl bytes.Buffer
 
-	if err = t.ExecuteTemplate(&tpl, "body", msg.DataMap); err != nil {
+	if err = t.ExecuteTemplate(&tpl, "body", msg.Data); err != nil {
 		return "", nil
 	}
 
@@ -101,13 +79,12 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	return plainMessage, nil
 }
 
-func (m *Mail) getSender() *Sender {
-	auth := smtp.PlainAuth("", m.Username, m.Password, m.Host)
-	return &Sender{auth}
+func (m *Mail) getSender() smtp.Auth {
+	return smtp.PlainAuth("", m.Username, m.Password, m.Host)
 }
 
 func (m *Mail) send(msg *Message) error {
-	return smtp.SendMail(fmt.Sprintf("%s:%d", m.Host, m.Port), m.getSender().auth, msg.From, msg.To, msg.ToBytes())
+	return smtp.SendMail(fmt.Sprintf("%s:%d", m.Host, m.Port), m.getSender(), m.Username, msg.To, msg.ToBytes())
 }
 
 func (m *Message) ToBytes() []byte {
@@ -115,6 +92,7 @@ func (m *Message) ToBytes() []byte {
 	withAttachments := len(m.Attachments) > 0
 	buf.WriteString(fmt.Sprintf("Subject: %s\n", m.Subject))
 	buf.WriteString(fmt.Sprintf("To: %s\n", strings.Join(m.To, ",")))
+	buf.WriteString(fmt.Sprintf("From: %s<%s>\n", m.FromName, m.From))
 	if len(m.CC) > 0 {
 		buf.WriteString(fmt.Sprintf("Cc: %s\n", strings.Join(m.CC, ",")))
 	}
@@ -155,23 +133,33 @@ func (m *Message) ToBytes() []byte {
 	return buf.Bytes()
 }
 
-// Test:
 // https://app.debugmail.io/app/teams/laby/projects/test-KA
-/* m := lib.Mail{
-	Host:       "app.debugmail.io",
-	Port:       25,
-	Username:   "80a6f626-3168-41c9-be7d-36c93eab65ef",
-	Password:   "510378c4-c0c2-4df7-bc98-ce974bfda293",
-	Encryption: "none",
-	From:       "80a6f626-3168-41c9-be7d-36c93eab65ef",
-	ErrorChan:  make(chan error),
+/* 	m := lib.Mail{
+	Host:      "app.debugmail.io",
+	Port:      25,
+	Username:  "80a6f626-3168-41c9-be7d-36c93eab65ef",
+	Password:  "510378c4-c0c2-4df7-bc98-ce974bfda293",
+	From:      "Nayeem@gmail.com",
+	FromName:  "Nayeem",
+	ErrorChan: make(chan error),
 }
 
 msg := lib.Message{
 	To:      []string{"recipient@example.com"},
 	Subject: "Test",
-	Data:    "Hello",
+	Data:    map[string]any{"message": "Hello"},
 }
 
-m.SendMail(msg, make(chan error))
-*/
+m.SendMail(msg, make(chan error)) */
+
+// Note: Add receiver to a type that uses built-in type
+// type Sender struct {
+// 	auth smtp.Auth
+// }
+
+// func (m *Mail) getSender() *Sender {
+// 	auth := smtp.PlainAuth("", m.Username, m.Password, m.Host)
+// 	return &Sender{auth}
+// }
+
+// func (s *Sender) send(msg *Message) {}
