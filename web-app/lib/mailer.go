@@ -39,6 +39,8 @@ type Message struct {
 }
 
 func (m *Mail) SendMail(msg Message, errorChan chan error) {
+	defer m.Wait.Done()
+
 	if msg.Template == "" {
 		msg.Template = "mail"
 	}

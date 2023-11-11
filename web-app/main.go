@@ -33,7 +33,10 @@ func main() {
 		Wg:     &wg,
 		Models: model.New(db),
 	}
+	cfg.Mailer = cfg.CreateMailer()
+
 	controller.InitCfg(&cfg)
+	go cfg.ListenForMail()
 
 	go gracefulShutdown()
 	server()
