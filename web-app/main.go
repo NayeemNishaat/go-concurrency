@@ -55,6 +55,7 @@ func server() {
 
 	route.InitRouter(mux)
 
+	fmt.Printf("Serving on http://localhost:%s\n", os.Getenv("PORT"))
 	err := http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), mux)
 
 	if err != nil {

@@ -74,7 +74,15 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 
 	user, err := cfg.Models.User.GetByEmail(email)
 
+	msg := lib.Message{
+		To:      []string{"nayeem@mail.com"},
+		Subject: "Invalid Login Attempt",
+		Data:    map[string]any{"message": "Someone tried to login with invalid creds."},
+	}
+
 	if err != nil {
+		cfg.postMail(msg)
+
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
 
@@ -85,6 +93,8 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	validPassword, err := user.PasswordMatches(password)
 
 	if err != nil {
+		cfg.postMail(msg)
+
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
 
@@ -93,6 +103,8 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !validPassword {
+		cfg.postMail(msg)
+
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
 
