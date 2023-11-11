@@ -76,8 +76,12 @@ func shutdown() {
 
 	defer db.Close()
 	wg.Wait() // Note: Block until wg is empty -> 0
+	controller.Cfg.Mailer.DoneChan <- true
 
-	log.Println("Cleaning up and shutting down app.")
+	log.Println("Closing channels and shutting down app.")
+	close(controller.Cfg.Mailer.DoneChan)
+	close(controller.Cfg.Mailer.ErrorChan)
+	close(controller.Cfg.Mailer.MailerChan)
 }
 
 // /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
