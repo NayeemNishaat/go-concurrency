@@ -61,7 +61,7 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 	td.Flash = ""
 	td.Warning = ""
 
-	v, ok := r.Context().Value(Flash{}).(string)
+	v, ok := r.Context().Value(Success{}).(string)
 	if ok {
 		td.Flash = v
 	} else {

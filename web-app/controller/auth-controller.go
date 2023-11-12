@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,9 @@ import (
 	"strconv"
 	"time"
 	"web/lib"
+	"web/model"
+
+	"github.com/golodash/galidator"
 )
 
 func RegisterMethodManager(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +21,7 @@ func RegisterMethodManager(w http.ResponseWriter, r *http.Request) {
 		RegisterPage(w, r)
 		return
 	case http.MethodPost:
-		Register(w, r)
+		Cfg.Register(w, r)
 		return
 	case http.MethodPut:
 		// Update an existing record.
@@ -54,8 +58,90 @@ func RegisterPage(w http.ResponseWriter, r *http.Request) {
 	lib.Render(w, r, "register.page.gohtml", nil)
 }
 
-func Register(w http.ResponseWriter, r *http.Request) {
-	//
+type RegisterData struct {
+	FirstName string `g:"required" required:"$field is required"`
+	LastName  string `g:"required" required:"$field is required"`
+	Password  string `g:"isStrong,required,max=50" isStrong:"$field should contain at least a special character, a number, a uppercase letter and minimum 8 characters long" required:"$field is required"`
+	Email     string `g:"required,min=5" required:"$field is required"`
+}
+
+func (cfg *Config) Register(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+
+	if err != nil {
+		log.Println(err)
+
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something Went Wrong")
+		r = r.WithContext(ctx)
+
+		lib.Render(w, r, "register.page.gohtml", nil)
+		return
+	}
+
+	u := model.User{
+		Email:     r.Form.Get("email"),
+		FirstName: r.Form.Get("first-name"),
+		LastName:  r.Form.Get("last-name"),
+		Password:  r.Form.Get("password"),
+		Active:    0,
+		IsAdmin:   0,
+	}
+
+	customValidators := galidator.Validators{"isStrong": lib.ValidateStrongPass}
+	validator := lib.GetCustomValidator(RegisterData{}, customValidators)
+	error := validator.Validate(u)
+
+	if error != nil {
+		// fmt.Printf("%+v\n", error)
+		// fmt.Printf("%#v\n", error)
+
+		s, err := json.MarshalIndent(&error, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(string(s))
+
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid data provided.")
+		r = r.WithContext(ctx)
+
+		lib.Render(w, r, "register.page.gohtml", nil)
+		return
+	}
+
+	_, err = u.Insert(u)
+
+	if err != nil {
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Failed To Register")
+		r = r.WithContext(ctx)
+
+		lib.Render(w, r, "register.page.gohtml", nil)
+		return
+	}
+
+	token, err := lib.GenerateToken(uint(u.ID))
+
+	if err != nil {
+		log.Println(err)
+
+		ctx := context.WithValue(r.Context(), lib.Error{}, "Something Went Wrong")
+		r = r.WithContext(ctx)
+
+		lib.Render(w, r, "register.page.gohtml", nil)
+		return
+	}
+
+	msg := lib.Message{
+		To:       []string{u.Email},
+		Subject:  "Activate Your Accounr",
+		Template: "confirmation-mail",
+		Data:     map[string]any{"link": fmt.Sprintf("%s/activate?token=%s", os.Getenv("BASE_URL"), token)},
+	}
+	cfg.postMail(msg)
+
+	ctx := context.WithValue(r.Context(), lib.Success{}, "Please check your email to activate your account!")
+	r = r.WithContext(ctx)
+
+	lib.Render(w, r, "home.page.gohtml", nil)
 }
 
 func LoginPage(w http.ResponseWriter, r *http.Request) {

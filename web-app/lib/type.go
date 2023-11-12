@@ -2,7 +2,7 @@ package lib
 
 type Error struct{}
 type Warning struct{}
-type Flash struct{}
+type Success struct{}
 type UserId struct{}
 
 // type userIdT string
