@@ -17,7 +17,7 @@ func Logging() Middleware {
 
 			// Do middleware things
 			start := time.Now()
-			defer func() { log.Println(r.URL.Path, time.Since(start)) }()
+			defer func() { log.Println(r.URL.RequestURI(), time.Since(start)) }()
 
 			// Call the next middleware/handler in chain
 			f(w, r)

@@ -30,7 +30,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	// token := r.URL.Query().Get("token")
 
 	// if token != "" {
-	// 	ctx := context.WithValue(r.Context(), lib.Flash{}, "Login Success!")
+	// 	ctx := context.WithValue(r.Context(), lib.Success{}, "Login Success!")
 	// 	r = r.WithContext(ctx)
 	// }
 

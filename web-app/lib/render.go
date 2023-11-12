@@ -15,7 +15,7 @@ type TemplateData struct {
 	IntMap        map[string]int
 	FloatMap      map[string]float64
 	DataMap       map[string]any
-	Flash         string
+	Success       string
 	Warning       string
 	Error         string
 	Authenticated bool
@@ -58,14 +58,11 @@ func Render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) 
 }
 
 func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
-	td.Flash = ""
-	td.Warning = ""
-
 	v, ok := r.Context().Value(Success{}).(string)
 	if ok {
-		td.Flash = v
+		td.Success = v
 	} else {
-		td.Flash = ""
+		td.Success = ""
 	}
 
 	v, ok = r.Context().Value(Warning{}).(string)
