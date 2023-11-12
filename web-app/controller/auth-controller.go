@@ -83,8 +83,8 @@ func (cfg *Config) Register(w http.ResponseWriter, r *http.Request) {
 		FirstName: r.Form.Get("first-name"),
 		LastName:  r.Form.Get("last-name"),
 		Password:  r.Form.Get("password"),
-		Active:    0,
-		IsAdmin:   0,
+		Active:    false,
+		IsAdmin:   false,
 	}
 
 	customValidators := galidator.Validators{"isStrong": lib.ValidateStrongPass}
@@ -192,6 +192,16 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		cfg.postMail(msg)
 
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
+		r = r.WithContext(ctx)
+
+		lib.Render(w, r, "login.page.gohtml", nil)
+		return
+	}
+
+	if !user.Active {
+		cfg.postMail(msg)
+
+		ctx := context.WithValue(r.Context(), lib.Warning{}, "Please check your email to activate your account and try again!")
 		r = r.WithContext(ctx)
 
 		lib.Render(w, r, "login.page.gohtml", nil)

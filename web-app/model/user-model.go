@@ -16,8 +16,8 @@ type User struct {
 	FirstName string
 	LastName  string
 	Password  string
-	Active    int
-	IsAdmin   int
+	Active    bool
+	IsAdmin   bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Plan      *Plan
