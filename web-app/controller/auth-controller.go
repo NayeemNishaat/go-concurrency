@@ -199,8 +199,6 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !user.Active {
-		cfg.postMail(msg)
-
 		ctx := context.WithValue(r.Context(), lib.Warning{}, "Please check your email to activate your account and try again!")
 		r = r.WithContext(ctx)
 
@@ -299,4 +297,16 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &ck)
 	http.Redirect(w, r, "/login", http.StatusPermanentRedirect)
+}
+
+func Activate(w http.ResponseWriter, r *http.Request) {
+	v, ok := r.Context().Value(lib.Warning{}).(uint64)
+	if !ok {
+		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid Token", Expires: time.Now().Add(time.Second)})
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
+	}
+	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI3NjYyMTgsInVzZXJJZCI6MH0.H2sUfLPIhqErs-wrhtYI--v7Iixt3JEDIpKChMXPCf8
+	u := model.User{ID: int(v)}
+	u.GetOne(u.ID)
 }
