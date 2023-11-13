@@ -314,8 +314,7 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
-	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmF0aW9uVG9rZW4iOmZhbHNlLCJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI4MjAzODYsInVzZXJJZCI6MX0.zQ0bysNK1TudIV5pv5kdAygZirD3Mk71ryQzCiGrSyM
-	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmF0aW9uVG9rZW4iOnRydWUsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTcxMjgyNjAxMiwidXNlcklkIjo1fQ.n-w8I38PEianr4GbxVSRN_qRep31NzsGFJ2-Zc7clUs
+
 	u := &model.User{ID: userId}
 	u, err := u.GetOne(u.ID)
 
