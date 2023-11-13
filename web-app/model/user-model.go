@@ -187,8 +187,6 @@ func (u *User) GetOne(id int) (*User, error) {
 
 	if err == nil {
 		user.Plan = &plan
-	} else {
-		log.Println("Error getting plan", err)
 	}
 
 	return &user, nil

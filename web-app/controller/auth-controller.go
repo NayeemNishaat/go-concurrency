@@ -314,8 +314,8 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
-	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI4MjAzODYsInVzZXJJZCI6MX0.QtjWCgl16uA-0v00auHy47ux9CR8aMKRf-kh7mFCAnU
-	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmF0aW9uVG9rZW4iOnRydWUsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTcxMjgyNjAxMiwidXNlcklkIjowfQ.IuSu9mrRoGsLxV9KpOTkdwMJTg_AYVC0XDTfNWHXRL4
+	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmF0aW9uVG9rZW4iOmZhbHNlLCJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI4MjAzODYsInVzZXJJZCI6MX0.zQ0bysNK1TudIV5pv5kdAygZirD3Mk71ryQzCiGrSyM
+	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmF0aW9uVG9rZW4iOnRydWUsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTcxMjgyNjAxMiwidXNlcklkIjo1fQ.n-w8I38PEianr4GbxVSRN_qRep31NzsGFJ2-Zc7clUs
 	u := &model.User{ID: userId}
 	u, err := u.GetOne(u.ID)
 
@@ -325,5 +325,17 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(u)
+	u.Active = true
+	err = u.Update()
+
+	if err != nil {
+		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "User activation failed!", Expires: time.Now().Add(time.Second)})
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
+	}
+
+	ctx := context.WithValue(r.Context(), lib.Success{}, "Account Activated.")
+	r = r.WithContext(ctx)
+
+	lib.Render(w, r, "login.page.gohtml", nil)
 }
