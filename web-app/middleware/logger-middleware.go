@@ -14,10 +14,9 @@ func Logging() Middleware {
 
 		// Define the http.HandlerFunc
 		return func(w http.ResponseWriter, r *http.Request) {
-
 			// Do middleware things
 			start := time.Now()
-			defer func() { log.Println(r.URL.RequestURI(), time.Since(start)) }()
+			defer func() { log.Println(r.URL.RequestURI(), time.Since(start)) }() // Important: Note: Defer will not block execution. If defer is not used then go will wait for the function to return before moving further.
 
 			// Call the next middleware/handler in chain
 			f(w, r)
