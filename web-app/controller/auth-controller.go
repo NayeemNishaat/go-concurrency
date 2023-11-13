@@ -300,13 +300,21 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func Activate(w http.ResponseWriter, r *http.Request) {
-	v, ok := r.Context().Value(lib.Warning{}).(uint64)
+	v, ok := r.Context().Value(lib.UserId{}).(uint64)
 	if !ok {
-		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid Token", Expires: time.Now().Add(time.Second)})
+		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid User", Expires: time.Now().Add(time.Second)})
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
-	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI3NjYyMTgsInVzZXJJZCI6MH0.H2sUfLPIhqErs-wrhtYI--v7Iixt3JEDIpKChMXPCf8
+	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI4MjAzODYsInVzZXJJZCI6MX0.QtjWCgl16uA-0v00auHy47ux9CR8aMKRf-kh7mFCAnU
 	u := model.User{ID: int(v)}
-	u.GetOne(u.ID)
+	user, err := u.GetOne(u.ID)
+
+	if err != nil {
+		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "User Not Found", Expires: time.Now().Add(time.Second)})
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
+	}
+
+	fmt.Println(user)
 }
