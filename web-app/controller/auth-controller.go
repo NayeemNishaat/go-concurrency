@@ -336,5 +336,5 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 	ctx := context.WithValue(r.Context(), lib.Success{}, "Account Activated.")
 	r = r.WithContext(ctx)
 
-	lib.Render(w, r, "login.page.gohtml", nil)
+	lib.Render(w, r, "login.page.gohtml", nil) // Note: Alternatively we can redirect the user to login route and send message info via cookie and expire it after 1 second.
 }
