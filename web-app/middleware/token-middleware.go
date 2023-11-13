@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"web/lib"
 
 	"github.com/dgrijalva/jwt-go"
@@ -16,12 +15,12 @@ func Token(allow bool) Middleware {
 		return func(w http.ResponseWriter, r *http.Request) {
 			tokenString := lib.ExtractToken(r)
 
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+			token, err := jwt.ParseWithClaims(tokenString, &lib.CustomClaims{}, func(token *jwt.Token) (any, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
 
-				return []byte(os.Getenv("API_SECRET")), nil
+				return []byte(os.Getenv("JWT_SECRET")), nil
 			})
 
 			if err != nil {
@@ -35,24 +34,14 @@ func Token(allow bool) Middleware {
 				return
 			}
 
-			claims, ok := token.Claims.(jwt.MapClaims)
+			claims, ok := token.Claims.(*lib.CustomClaims)
 
 			if ok && token.Valid {
-				// fmt.Sprintf("%v", claims["userId"])
-				uId, err := strconv.ParseUint(fmt.Sprintf("%.f", claims["userId"]), 10, 32)
+				uId := claims.UserId
+				activationToken := claims.ActivationToken
 
-				if err != nil {
-					if allow {
-						f(w, r)
-						return
-					}
-
-					w.WriteHeader(http.StatusUnauthorized)
-					fmt.Fprintln(w, "Unauthorized")
-					return
-				}
-
-				ctx := context.WithValue(r.Context(), lib.UserId{}, uId) // TODO: Add more user info.
+				ctx := context.WithValue(r.Context(), lib.UserId{}, uId)
+				ctx = context.WithValue(ctx, lib.ActivationToken{}, activationToken)
 				r = r.WithContext(ctx)
 
 				f(w, r)

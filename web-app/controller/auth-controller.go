@@ -108,7 +108,7 @@ func (cfg *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = u.Insert(u)
+	userId, err := u.Insert(u)
 
 	if err != nil {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Failed To Register")
@@ -118,7 +118,7 @@ func (cfg *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := lib.GenerateToken(uint(u.ID))
+	token, err := lib.GenerateToken(userId, true)
 
 	if err != nil {
 		log.Println(err)
@@ -206,7 +206,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := lib.GenerateToken(uint(user.ID))
+	token, err := lib.GenerateToken(user.ID, false)
 
 	if err != nil {
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
@@ -300,15 +300,24 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func Activate(w http.ResponseWriter, r *http.Request) {
-	v, ok := r.Context().Value(lib.UserId{}).(uint64)
+	userId, ok := r.Context().Value(lib.UserId{}).(int)
+
 	if !ok {
-		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid User", Expires: time.Now().Add(time.Second)})
+		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid Token", Expires: time.Now().Add(time.Second)})
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
+	}
+
+	activationToken, ok := r.Context().Value(lib.ActivationToken{}).(bool)
+	if !ok || !activationToken {
+		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid Token", Expires: time.Now().Add(time.Second)})
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
 	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTI4MjAzODYsInVzZXJJZCI6MX0.QtjWCgl16uA-0v00auHy47ux9CR8aMKRf-kh7mFCAnU
-	u := model.User{ID: int(v)}
-	user, err := u.GetOne(u.ID)
+	// http://localhost/activate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3RpdmF0aW9uVG9rZW4iOnRydWUsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTcxMjgyNjAxMiwidXNlcklkIjowfQ.IuSu9mrRoGsLxV9KpOTkdwMJTg_AYVC0XDTfNWHXRL4
+	u := &model.User{ID: userId}
+	u, err := u.GetOne(u.ID)
 
 	if err != nil {
 		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "User Not Found", Expires: time.Now().Add(time.Second)})
@@ -316,5 +325,5 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(user)
+	fmt.Println(u)
 }
