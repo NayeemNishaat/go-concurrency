@@ -19,6 +19,7 @@ func (cfg *Config) PlanPage(w http.ResponseWriter, r *http.Request) {
 
 	token, err := r.Cookie("token")
 	if err != nil {
+		log.Println(err)
 		http.Redirect(w, r, "/500", http.StatusInternalServerError)
 		return
 	}

@@ -15,7 +15,7 @@ type User struct {
 	Email     string
 	FirstName string
 	LastName  string
-	Password  string
+	Password  string `json:"-"`
 	Active    bool
 	IsAdmin   bool
 	CreatedAt time.Time

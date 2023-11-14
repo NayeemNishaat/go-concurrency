@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -273,6 +274,8 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 	}
 
+	encodedUser := base64.StdEncoding.EncodeToString(byteUser)
+
 	ck = http.Cookie{
 		Name:     "user",
 		Domain:   os.Getenv("COOKIE_DOMAIN"),
@@ -280,7 +283,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 		Secure:   secure,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Value:    string(byteUser),
+		Value:    encodedUser,
 		MaxAge:   int(maxAge),
 		Expires:  expires,
 	}

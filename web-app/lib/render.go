@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -81,7 +82,7 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 		td.Error = ""
 	}
 
-	_, ok = r.Context().Value(UserId{}).(uint64)
+	_, ok = r.Context().Value(UserId{}).(int)
 
 	if ok {
 		td.Authenticated = true
@@ -91,13 +92,21 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 			log.Println("User data not found.")
 		} else {
 			var user model.User
-			err = json.Unmarshal([]byte(userCookie.Value), &user)
+
+			decodedUser, err := base64.StdEncoding.DecodeString(userCookie.Value)
 
 			if err != nil {
-				log.Println("Failed to unmarshall data")
+				log.Println("Failed to decode cookie")
 			} else {
-				td.User = &user
+				err = json.Unmarshal(decodedUser, &user)
+
+				if err != nil {
+					log.Println("Failed to unmarshall data")
+				} else {
+					td.User = &user
+				}
 			}
+
 		}
 	} else {
 		td.Authenticated = false
