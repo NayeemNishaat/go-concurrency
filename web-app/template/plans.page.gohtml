@@ -3,6 +3,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.9.0/dist/sweetalert2.all.min.js"></script>
 
 {{define "content" }}
+    {{$user := .User}}
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
@@ -22,7 +23,11 @@
                         <td>{{.PlanName}}</td>
                         <td class="text-center">{{.PlanAmountFormatted}}/month</td>
                         <td class="text-center">
-                          <a class="btn btn-primary btn-sm" href="#!" onclick="selectPlan({{.ID}}, '{{.PlanName}}')">Select</a>
+                          {{if and ($user.Plan) (eq $user.Plan.ID .ID)}}
+                            <strong>Current Plan</strong>
+                          {{else}}
+                            <a class="btn btn-primary btn-sm" href="#!" onclick="selectPlan({{.ID}}, '{{.PlanName}}')">Select</a>
+                          {{end}}
                         </td>
                       </tr>
                     {{end}}
