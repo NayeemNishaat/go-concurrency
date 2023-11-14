@@ -1,11 +1,13 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
+	"web/model"
 )
 
 var pathToTemplates = "./template"
@@ -21,7 +23,7 @@ type TemplateData struct {
 	Authenticated bool
 	Now           time.Time
 	CsrfToken     string
-	// User          *data.User
+	User          *model.User
 }
 
 func Render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) {
@@ -83,6 +85,20 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 
 	if ok {
 		td.Authenticated = true
+
+		userCookie, err := r.Cookie("user")
+		if err != nil {
+			log.Println("User data not found.")
+		} else {
+			var user model.User
+			err = json.Unmarshal([]byte(userCookie.Value), &user)
+
+			if err != nil {
+				log.Println("Failed to unmarshall data")
+			} else {
+				td.User = &user
+			}
+		}
 	} else {
 		td.Authenticated = false
 	}

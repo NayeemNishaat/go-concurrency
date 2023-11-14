@@ -268,6 +268,24 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &ck)
 
+	byteUser, err := json.Marshal(user)
+	if err != nil {
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+	}
+
+	ck = http.Cookie{
+		Name:     "user",
+		Domain:   os.Getenv("COOKIE_DOMAIN"),
+		Path:     "/",
+		Secure:   secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Value:    string(byteUser),
+		MaxAge:   int(maxAge),
+		Expires:  expires,
+	}
+	http.SetCookie(w, &ck)
+
 	// http.Redirect(w, r, fmt.Sprintf("/welcome?token=%s", token), http.StatusSeeOther)
 	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
 }
