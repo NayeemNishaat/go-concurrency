@@ -64,23 +64,23 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 	v, ok := r.Context().Value(Success{}).(string)
 	if ok {
 		td.Success = v
-	} else {
+	} /* else {
 		td.Success = ""
-	}
+	} */
 
 	v, ok = r.Context().Value(Warning{}).(string)
 	if ok {
 		td.Warning = v
-	} else {
+	} /* else {
 		td.Warning = ""
-	}
+	} */
 
 	v, ok = r.Context().Value(Error{}).(string)
 	if ok {
 		td.Error = v
-	} else {
+	} /* else {
 		td.Error = ""
-	}
+	} */
 
 	_, ok = r.Context().Value(UserId{}).(int)
 

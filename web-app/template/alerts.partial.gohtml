@@ -4,21 +4,21 @@
 
 
             {{if ne .Success ""}}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="text-center alert alert-success alert-dismissible fade show" role="alert">
                     {{.Success}}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {{end}}
 
             {{if ne .Error ""}}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div class="text-center alert alert-danger alert-dismissible fade show" role="alert">
                     {{.Error}}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {{end}}
 
             {{if ne .Warning ""}}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="text-center alert alert-warning alert-dismissible fade show" role="alert">
                     {{.Warning}}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>

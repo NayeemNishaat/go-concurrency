@@ -1,7 +1,6 @@
 package route
 
 import (
-	"fmt"
 	"net/http"
 	"web/middleware"
 )
@@ -11,10 +10,9 @@ func InitRouter(m *http.ServeMux) {
 	WelcomeRoute(m, middleware.Logging())
 	AuthRoute(m, middleware.Logging())
 	SubscriptionRoute(m, middleware.Logging())
+	ErrorRoute(m, middleware.Logging())
 
-	m.HandleFunc("/404", middleware.Chain(func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "This Route Is Unavailable!\n") }, []middleware.Middleware{middleware.Logging()}))
-
-	m.HandleFunc("/500", middleware.Chain(func(w http.ResponseWriter, r *http.Request) {
+	/* m.HandleFunc("/500", middleware.Chain(func(w http.ResponseWriter, r *http.Request) {
 		msg, err := r.Cookie("msg")
 
 		if err != nil {
@@ -23,5 +21,5 @@ func InitRouter(m *http.ServeMux) {
 		}
 
 		fmt.Fprint(w, msg.Value)
-	}, []middleware.Middleware{middleware.Logging()}))
+	}, []middleware.Middleware{middleware.Logging()})) */
 }
