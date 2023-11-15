@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
+	"time"
 )
 
 func Csrf() Middleware {
@@ -15,8 +15,8 @@ func Csrf() Middleware {
 			}
 
 			if token, err := r.Cookie("token"); err != nil || csrfToken != token.Value {
-				w.WriteHeader(http.StatusForbidden)
-				fmt.Fprintln(w, "Forbidden")
+				http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Forbidden", Expires: time.Now().Add(time.Second)})
+				http.Redirect(w, r, "/error", http.StatusSeeOther)
 				return
 			}
 

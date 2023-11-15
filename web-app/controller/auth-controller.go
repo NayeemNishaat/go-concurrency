@@ -271,7 +271,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 
 	byteUser, err := json.Marshal(user)
 	if err != nil {
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 	}
 
 	encodedUser := base64.StdEncoding.EncodeToString(byteUser)
@@ -325,14 +325,14 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 
 	if !ok {
 		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid Token", Expires: time.Now().Add(time.Second)})
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
 	}
 
 	activationToken, ok := r.Context().Value(lib.ActivationToken{}).(bool)
 	if !ok || !activationToken {
 		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Invalid Token", Expires: time.Now().Add(time.Second)})
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
 	}
 
@@ -341,7 +341,7 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "User Not Found", Expires: time.Now().Add(time.Second)})
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
 	}
 
@@ -350,7 +350,7 @@ func Activate(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.SetCookie(w, &http.Cookie{Name: "msg", Value: "User activation failed!", Expires: time.Now().Add(time.Second)})
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
 	}
 

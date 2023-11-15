@@ -12,7 +12,7 @@ func InitRouter(m *http.ServeMux) {
 	SubscriptionRoute(m, middleware.Logging())
 	ErrorRoute(m, middleware.Logging())
 
-	/* m.HandleFunc("/500", middleware.Chain(func(w http.ResponseWriter, r *http.Request) {
+	/* m.HandleFunc("/error", middleware.Chain(func(w http.ResponseWriter, r *http.Request) {
 		msg, err := r.Cookie("msg")
 
 		if err != nil {

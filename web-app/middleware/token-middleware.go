@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 	"web/lib"
 
 	"github.com/dgrijalva/jwt-go"
@@ -29,8 +30,8 @@ func Token(allow bool) Middleware {
 					return
 				}
 
-				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Fprintln(w, "Unauthorized")
+				http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
+				http.Redirect(w, r, "/error", http.StatusSeeOther)
 				return
 			}
 
@@ -51,8 +52,9 @@ func Token(allow bool) Middleware {
 					return
 				}
 
-				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Fprintln(w, "Unauthorized")
+				http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
+				http.Redirect(w, r, "/error", http.StatusSeeOther)
+				return
 			}
 		}
 	}

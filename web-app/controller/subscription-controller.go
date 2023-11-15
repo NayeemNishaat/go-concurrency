@@ -10,7 +10,7 @@ func (cfg *Config) PlanPage(w http.ResponseWriter, r *http.Request) {
 	plans, err := cfg.Models.Plan.GetAll()
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
 	}
 
@@ -20,7 +20,7 @@ func (cfg *Config) PlanPage(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, "/500", http.StatusInternalServerError)
+		http.Redirect(w, r, "/error", http.StatusInternalServerError)
 		return
 	}
 
