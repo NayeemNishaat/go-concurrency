@@ -1,4 +1,4 @@
-function selectPlan(i, plan) {
+function selectPlan(i, plan, token) {
   Swal.fire({
     title: "Subscribe",
     html: `Subscribe to the ${plan} plan?`,
@@ -6,7 +6,7 @@ function selectPlan(i, plan) {
     confirmButtonText: "Subscribe"
   }).then((res) => {
     if (res.isConfirmed) {
-      // window.location.href = "/subscribe?id=" + i;
+      window.location.href = "/subscribe?id=" + i + "&token=" + token;
     }
   });
 }

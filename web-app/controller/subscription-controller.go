@@ -26,3 +26,5 @@ func (cfg *Config) PlanPage(w http.ResponseWriter, r *http.Request) {
 
 	lib.Render(w, r, "plans.page.gohtml", &lib.TemplateData{CsrfToken: token.Value, DataMap: dataMap})
 }
+
+func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {}
