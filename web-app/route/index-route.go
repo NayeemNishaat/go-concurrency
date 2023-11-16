@@ -13,7 +13,7 @@ func InitRouter(m *http.ServeMux) {
 	ErrorRoute(m, middleware.Logging())
 
 	/* m.HandleFunc("/error", middleware.Chain(func(w http.ResponseWriter, r *http.Request) {
-		msg, err := r.Cookie("msg")
+		msg, err := r.Cookie("errorMsg")
 
 		if err != nil {
 			fmt.Fprint(w, "Something Went Wrong!")

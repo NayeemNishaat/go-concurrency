@@ -6,6 +6,7 @@ type Error struct{}
 type Warning struct{}
 type Success struct{}
 type UserId struct{}
+type User struct{}
 type ActivationToken struct{}
 
 type CustomClaims struct {

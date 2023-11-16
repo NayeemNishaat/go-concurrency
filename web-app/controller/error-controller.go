@@ -6,7 +6,7 @@ import (
 )
 
 func ErrorPage(w http.ResponseWriter, r *http.Request) {
-	msg, err := r.Cookie("msg")
+	msg, err := r.Cookie("errorMsg")
 
 	if err != nil {
 		if r.URL.Path == "/404" {

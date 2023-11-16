@@ -15,7 +15,7 @@ func Csrf() Middleware {
 			}
 
 			if token, err := r.Cookie("token"); err != nil || csrfToken != token.Value {
-				http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Forbidden", Expires: time.Now().Add(time.Second)})
+				http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Forbidden", Expires: time.Now().Add(time.Second)})
 				http.Redirect(w, r, "/error", http.StatusSeeOther)
 				return
 			}

@@ -75,12 +75,17 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 		td.Warning = ""
 	} */
 
-	v, ok = r.Context().Value(Error{}).(string)
-	if ok {
-		td.Error = v
-	} /* else {
-		td.Error = ""
-	} */
+	msg, err := r.Cookie("errorMsg")
+	if err == nil {
+		td.Error = msg.Value
+	} else {
+		v, ok = r.Context().Value(Error{}).(string)
+		if ok {
+			td.Error = v
+		} /* else {
+			td.Error = ""
+		} */
+	}
 
 	_, ok = r.Context().Value(UserId{}).(int)
 
@@ -106,7 +111,6 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 					td.User = &user
 				}
 			}
-
 		}
 	} else {
 		td.Authenticated = false

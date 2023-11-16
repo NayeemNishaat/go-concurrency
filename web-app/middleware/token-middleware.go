@@ -2,11 +2,14 @@ package middleware
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 	"web/lib"
+	"web/model"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -30,7 +33,7 @@ func Token(allow bool) Middleware {
 					return
 				}
 
-				http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
+				http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
 				http.Redirect(w, r, "/error", http.StatusSeeOther)
 				return
 			}
@@ -45,6 +48,31 @@ func Token(allow bool) Middleware {
 				ctx = context.WithValue(ctx, lib.ActivationToken{}, activationToken)
 				r = r.WithContext(ctx)
 
+				userCookie, err := r.Cookie("user")
+				if err != nil {
+					http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
+					http.Redirect(w, r, "/error", http.StatusSeeOther)
+					return
+				}
+				var user model.User
+
+				decodedUser, err := base64.StdEncoding.DecodeString(userCookie.Value)
+
+				if err != nil {
+					http.Redirect(w, r, "/error", http.StatusSeeOther)
+					return
+				}
+
+				err = json.Unmarshal(decodedUser, &user)
+
+				if err != nil {
+					http.Redirect(w, r, "/error", http.StatusSeeOther)
+					return
+				}
+
+				ctx = context.WithValue(r.Context(), lib.User{}, &user)
+				r = r.WithContext(ctx)
+
 				f(w, r)
 			} else {
 				if allow {
@@ -52,7 +80,7 @@ func Token(allow bool) Middleware {
 					return
 				}
 
-				http.SetCookie(w, &http.Cookie{Name: "msg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
+				http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Unauthorized", Expires: time.Now().Add(time.Second)})
 				http.Redirect(w, r, "/error", http.StatusSeeOther)
 				return
 			}
