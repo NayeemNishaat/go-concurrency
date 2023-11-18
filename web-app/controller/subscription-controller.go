@@ -57,4 +57,14 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Please log in first.", Expires: time.Now().Add(time.Second)})
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
+
+	cfg.Wg.Add(1)
+	go func() {
+		cfg.Wg.Done()
+
+		invoice, err := cfg.getInvoice(user, plan)
+		if err != nil {
+
+		}
+	}()
 }

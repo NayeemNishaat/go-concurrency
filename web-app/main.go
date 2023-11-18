@@ -29,12 +29,15 @@ func main() {
 
 	db = lib.InitDB()
 
-	cfg := controller.Config{
-		Wg:     &wg,
-		Models: model.New(db),
+	cfg := lib.Config{
+		Wg:            &wg,
+		Models:        model.New(db),
+		ErrorChan:     make(chan error),
+		ErrorChanDone: make(chan bool),
 	}
 	cfg.Mailer = cfg.CreateMailer()
 
+	lib.InitCfg(&cfg)
 	controller.InitCfg(&cfg)
 	go cfg.ListenForMail()
 
@@ -77,12 +80,12 @@ func shutdown() {
 
 	defer db.Close()
 	wg.Wait() // Note: Block until wg is empty -> 0
-	controller.Cfg.Mailer.DoneChan <- true
+	lib.Cfg.Mailer.DoneChan <- true
 
 	log.Println("Closing channels and shutting down app.")
-	close(controller.Cfg.Mailer.DoneChan)
-	close(controller.Cfg.Mailer.ErrorChan)
-	close(controller.Cfg.Mailer.MailerChan)
+	close(lib.Cfg.Mailer.DoneChan)
+	close(lib.Cfg.Mailer.ErrorChan)
+	close(lib.Cfg.Mailer.MailerChan)
 }
 
 // /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16

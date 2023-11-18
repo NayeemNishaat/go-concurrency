@@ -1,8 +1,7 @@
-package controller
+package lib
 
 import (
 	"log"
-	"web/lib"
 )
 
 func (cfg *Config) ListenForMail() {
@@ -18,7 +17,7 @@ func (cfg *Config) ListenForMail() {
 	}
 }
 
-func (cfg *Config) postMail(msg lib.Message) {
+func (cfg *Config) PostMail(msg Message) {
 	cfg.Wg.Add(1)
 	cfg.Mailer.MailerChan <- msg
 }

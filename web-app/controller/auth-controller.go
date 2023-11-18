@@ -137,7 +137,7 @@ func (cfg *Config) Register(w http.ResponseWriter, r *http.Request) {
 		Template: "confirmation-mail",
 		Data:     map[string]any{"link": fmt.Sprintf("%s/activate?token=%s", os.Getenv("BASE_URL"), token)},
 	}
-	cfg.postMail(msg)
+	cfg.PostMail(msg)
 
 	ctx := context.WithValue(r.Context(), lib.Success{}, "Please check your email to activate your account!")
 	r = r.WithContext(ctx)
@@ -168,7 +168,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		cfg.postMail(msg)
+		cfg.PostMail(msg)
 
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
@@ -180,7 +180,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	validPassword, err := user.PasswordMatches(password)
 
 	if err != nil {
-		cfg.postMail(msg)
+		cfg.PostMail(msg)
 
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
@@ -190,7 +190,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !validPassword {
-		cfg.postMail(msg)
+		cfg.PostMail(msg)
 
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Invalid Credentials")
 		r = r.WithContext(ctx)
