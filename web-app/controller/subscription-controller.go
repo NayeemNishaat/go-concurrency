@@ -62,9 +62,23 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		cfg.Wg.Done()
 
-		invoice, err := cfg.getInvoice(user, plan)
+		invoice, err := cfg.GetInvoice(user, plan)
 		if err != nil {
-
+			cfg.ErrorChan <- err
 		}
+
+		msg := lib.Message{
+			To:       []string{user.Email},
+			Subject:  "Invoice",
+			Data:     map[string]any{"invoice": invoice},
+			Template: "invoice",
+		}
+
+		cfg.PostMail(msg)
+	}()
+
+	cfg.Wg.Add(1)
+	go func() {
+		defer cfg.Wg.Done()
 	}()
 }

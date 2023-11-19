@@ -41,6 +41,8 @@ func main() {
 	controller.InitCfg(&cfg)
 	go cfg.ListenForMail()
 
+	go cfg.ListenForErrors()
+
 	go gracefulShutdown()
 	server()
 }
@@ -81,11 +83,16 @@ func shutdown() {
 	defer db.Close()
 	wg.Wait() // Note: Block until wg is empty -> 0
 	lib.Cfg.Mailer.DoneChan <- true
+	lib.Cfg.ErrorChanDone <- true
 
 	log.Println("Closing channels and shutting down app.")
 	close(lib.Cfg.Mailer.DoneChan)
 	close(lib.Cfg.Mailer.ErrorChan)
 	close(lib.Cfg.Mailer.MailerChan)
+	close(lib.Cfg.ErrorChan)
+	close(lib.Cfg.ErrorChanDone)
 }
 
 // /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
+// go list ./...
+// go list ...
