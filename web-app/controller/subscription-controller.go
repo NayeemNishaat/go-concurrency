@@ -2,8 +2,11 @@ package controller
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 	"web/lib"
@@ -80,5 +83,37 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 	cfg.Wg.Add(1)
 	go func() {
 		defer cfg.Wg.Done()
+
+		pdf := cfg.GenerateManual(user, plan)
+
+		err := pdf.OutputFileAndClose(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
+
+		if err != nil {
+			cfg.ErrorChan <- err
+			return
+		}
+
+		byteFile, err := os.ReadFile(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
+
+		if err != nil {
+			cfg.ErrorChan <- err
+			return
+		}
+
+		msg := lib.Message{
+			To:      []string{user.Email},
+			Subject: "Your Manual",
+			Attachments: map[string][]byte{
+				"Manual.pdf": byteFile,
+			},
+		}
+
+		cfg.PostMail(msg)
+
+		// Test:
+		cfg.ErrorChan <- errors.New("testing error chan")
 	}()
+
+	http.SetCookie(w, &http.Cookie{Name: "succMsg", Value: "Subscription Successful", Expires: time.Now().Add(time.Second)})
+	http.Redirect(w, r, "/plan", http.StatusSeeOther)
 }

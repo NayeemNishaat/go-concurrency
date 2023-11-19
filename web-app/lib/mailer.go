@@ -8,6 +8,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/smtp"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -133,6 +135,17 @@ func (m *Message) ToBytes() []byte {
 	}
 
 	return buf.Bytes()
+}
+
+func (m *Message) AttachFile(src string) error {
+	b, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+
+	_, fileName := filepath.Split(src)
+	m.Attachments[fileName] = b
+	return nil
 }
 
 // https://app.debugmail.io/app/teams/laby/projects/test-KA

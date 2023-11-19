@@ -61,25 +61,35 @@ func Render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) 
 }
 
 func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
-	v, ok := r.Context().Value(Success{}).(string)
-	if ok {
-		td.Success = v
-	} /* else {
-		td.Success = ""
-	} */
+	msg, err := r.Cookie("succMsg")
+	if err == nil {
+		td.Success = msg.Value
+	} else {
+		v, ok := r.Context().Value(Success{}).(string)
+		if ok {
+			td.Success = v
+		} /* else {
+			td.Success = ""
+		} */
+	}
 
-	v, ok = r.Context().Value(Warning{}).(string)
-	if ok {
-		td.Warning = v
-	} /* else {
-		td.Warning = ""
-	} */
+	msg, err = r.Cookie("warnMsg")
+	if err == nil {
+		td.Warning = msg.Value
+	} else {
+		v, ok := r.Context().Value(Warning{}).(string)
+		if ok {
+			td.Warning = v
+		} /* else {
+			td.Warning = ""
+		} */
+	}
 
-	msg, err := r.Cookie("errorMsg")
+	msg, err = r.Cookie("errorMsg")
 	if err == nil {
 		td.Error = msg.Value
 	} else {
-		v, ok = r.Context().Value(Error{}).(string)
+		v, ok := r.Context().Value(Error{}).(string)
 		if ok {
 			td.Error = v
 		} /* else {
@@ -87,7 +97,7 @@ func AddDefaultData(td *TemplateData, r *http.Request) *TemplateData {
 		} */
 	}
 
-	_, ok = r.Context().Value(UserId{}).(int)
+	_, ok := r.Context().Value(UserId{}).(int)
 
 	if ok {
 		td.Authenticated = true
