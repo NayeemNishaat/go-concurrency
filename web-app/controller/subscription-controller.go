@@ -103,8 +103,11 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			cfg.ErrorChan <- err
+			os.Remove(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
 			return
 		}
+
+		os.Remove(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
 
 		msg := lib.Message{
 			To:      []string{user.Email},
