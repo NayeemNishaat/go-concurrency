@@ -2,6 +2,8 @@ package controller
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -38,6 +40,7 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 	planId, err := strconv.Atoi(id)
 
 	if err != nil {
+		log.Println(err)
 		http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Plan Id not found!", Expires: time.Now().Add(time.Second)})
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
@@ -46,6 +49,7 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 	plan, err := cfg.Models.Plan.GetOne(planId)
 
 	if err != nil {
+		log.Println(err)
 		ctx := context.WithValue(r.Context(), lib.Error{}, "Plan not found.")
 		r = r.WithContext(ctx)
 
@@ -56,6 +60,7 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(lib.User{}).(*model.User)
 
 	if !ok {
+		log.Println("Failed to cast lib.User{} to *model.User")
 		http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Please log in first.", Expires: time.Now().Add(time.Second)})
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -104,15 +109,52 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 		msg := lib.Message{
 			To:      []string{user.Email},
 			Subject: "Your Manual",
+			Data:    map[string]any{"message": "Your manual is attached!"},
 			Attachments: map[string][]byte{
 				"Manual.pdf": byteFile,
 			},
 		}
 
-		cfg.PostMail(msg)
-
 		// cfg.ErrorChan <- errors.New("testing error chan") // Test:
+		cfg.PostMail(msg)
 	}()
+
+	err = cfg.Models.Plan.SubscribeUserToPlan(*user, *plan)
+
+	if err != nil {
+		log.Println(err)
+		http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Subscription request failed.", Expires: time.Now().Add(time.Second)})
+		http.Redirect(w, r, "/plan", http.StatusSeeOther)
+		return
+	}
+
+	u, err := cfg.Models.User.GetOne(user.ID)
+
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+	byteUser, err := json.Marshal(u)
+
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+	strUser := base64.StdEncoding.EncodeToString(byteUser)
+
+	ck, err := lib.GenerateCookie("user", strUser, time.Time{})
+
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+	http.SetCookie(w, ck)
 
 	http.SetCookie(w, &http.Cookie{Name: "succMsg", Value: "Subscription Successful", Expires: time.Now().Add(time.Second)})
 	http.Redirect(w, r, "/plan", http.StatusSeeOther)

@@ -18,7 +18,7 @@ func (cfg *Config) GenerateManual(u *model.User, p *model.Plan) *fpdf.Fpdf {
 
 	pdf.MultiCell(0, 4, fmt.Sprintf("%s %s", u.FirstName, u.LastName), "", "C", false)
 	pdf.Ln(5)
-	pdf.MultiCell(0, 4, fmt.Sprintf("%s User Guide", u.FirstName), "", "C", false)
+	pdf.MultiCell(0, 4, fmt.Sprintf("%s User Guide", u.Plan.PlanName), "", "C", false)
 
 	return pdf
 }

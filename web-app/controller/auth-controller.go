@@ -234,40 +234,15 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(json) */
 
-	expires := time.Now().AddDate(0, 0, 1)
-	secure, err := strconv.ParseBool(os.Getenv("SECURE_COOKIE"))
+	ck, err := lib.GenerateCookie(os.Getenv("COOKIE_TOKEN_NAME"), token, time.Time{})
 
 	if err != nil {
-		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
-		r = r.WithContext(ctx)
-
-		lib.Render(w, r, "login.page.gohtml", nil)
+		log.Println(err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		return
 	}
 
-	maxAge, err := strconv.ParseUint(os.Getenv("COOKIE_MAX_AGE"), 10, 32)
-
-	if err != nil {
-		fmt.Println(err)
-		ctx := context.WithValue(r.Context(), lib.Error{}, "Something went wrong!")
-		r = r.WithContext(ctx)
-
-		lib.Render(w, r, "login.page.gohtml", nil)
-		return
-	}
-
-	ck := http.Cookie{
-		Name:     os.Getenv("COOKIE_NAME"),
-		Domain:   os.Getenv("COOKIE_DOMAIN"),
-		Path:     "/",
-		Secure:   secure,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Value:    token,
-		MaxAge:   int(maxAge),
-		Expires:  expires,
-	}
-	http.SetCookie(w, &ck)
+	http.SetCookie(w, ck)
 
 	byteUser, err := json.Marshal(user)
 	if err != nil {
@@ -276,18 +251,15 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 
 	encodedUser := base64.StdEncoding.EncodeToString(byteUser)
 
-	ck = http.Cookie{
-		Name:     "user",
-		Domain:   os.Getenv("COOKIE_DOMAIN"),
-		Path:     "/",
-		Secure:   secure,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Value:    encodedUser,
-		MaxAge:   int(maxAge),
-		Expires:  expires,
+	ck, err = lib.GenerateCookie("user", encodedUser, time.Time{})
+
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
 	}
-	http.SetCookie(w, &ck)
+
+	http.SetCookie(w, ck)
 
 	// http.Redirect(w, r, fmt.Sprintf("/welcome?token=%s", token), http.StatusSeeOther)
 	http.Redirect(w, r, "/welcome", http.StatusSeeOther)
