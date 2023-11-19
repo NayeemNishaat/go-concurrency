@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -54,11 +53,12 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, ok := r.Context().Value(lib.User{}).(model.User)
+	user, ok := r.Context().Value(lib.User{}).(*model.User)
 
 	if !ok {
 		http.SetCookie(w, &http.Cookie{Name: "errorMsg", Value: "Please log in first.", Expires: time.Now().Add(time.Second)})
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
 	}
 
 	cfg.Wg.Add(1)
@@ -68,6 +68,7 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 		invoice, err := cfg.GetInvoice(user, plan)
 		if err != nil {
 			cfg.ErrorChan <- err
+			return
 		}
 
 		msg := lib.Message{
@@ -110,8 +111,7 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 		cfg.PostMail(msg)
 
-		// Test:
-		cfg.ErrorChan <- errors.New("testing error chan")
+		// cfg.ErrorChan <- errors.New("testing error chan") // Test:
 	}()
 
 	http.SetCookie(w, &http.Cookie{Name: "succMsg", Value: "Subscription Successful", Expires: time.Now().Add(time.Second)})

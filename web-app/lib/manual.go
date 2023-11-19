@@ -7,7 +7,7 @@ import (
 	"github.com/go-pdf/fpdf"
 )
 
-func (cfg *Config) GenerateManual(u model.User, p *model.Plan) *fpdf.Fpdf {
+func (cfg *Config) GenerateManual(u *model.User, p *model.Plan) *fpdf.Fpdf {
 	pdf := fpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 

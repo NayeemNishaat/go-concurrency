@@ -6,7 +6,7 @@ function selectPlan(i, plan, token) {
     confirmButtonText: "Subscribe"
   }).then((res) => {
     if (res.isConfirmed) {
-      window.location.href = "/subscribe?id=" + i + "&token=" + token;
+      window.location.href = "/subscribe?id=" + i + "&csrfToken=" + token;
     }
   });
 }
