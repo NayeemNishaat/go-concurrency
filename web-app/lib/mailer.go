@@ -111,6 +111,7 @@ func (m *Message) ToBytes() []byte {
 	if withAttachments {
 		buf.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", boundary))
 		buf.WriteString(fmt.Sprintf("--%s\n", boundary))
+		buf.WriteString("Content-Type: text/html; charset=utf-8\n")
 	} else {
 		buf.WriteString("Content-Type: text/html; charset=utf-8\n")
 		// buf.WriteString("Content-Type: text/plain; charset=utf-8\n")
