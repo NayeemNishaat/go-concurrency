@@ -1,24 +1,24 @@
-package main
+package lib
 
 import (
 	"encoding/gob"
 	"os"
 	"sync"
 	"testing"
-	"web/lib"
 	"web/model"
 )
 
-var testConfig lib.Config
+var TestConfig Config
 
 func TestMain(m *testing.M) {
 	gob.Register(model.User{})
 
-	testConfig = lib.Config{
+	TestConfig = Config{
 		Wg:            &sync.WaitGroup{},
 		ErrorChan:     make(chan error),
 		ErrorChanDone: make(chan bool),
-		Mailer:        &lib.Mail{},
+		Mailer:        &Mail{},
+		Models:        model.Models{},
 	}
 
 	os.Exit(m.Run())

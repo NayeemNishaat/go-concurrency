@@ -45,7 +45,7 @@ func TestIsAuthenticated(t *testing.T) {
 }
 
 func TestRender(t *testing.T) {
-	pathToTemplates = "../template"
+	PathToTemplates = "../template"
 
 	rr := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/", nil)

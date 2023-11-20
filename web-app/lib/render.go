@@ -11,7 +11,7 @@ import (
 	"web/model"
 )
 
-var pathToTemplates = "./template"
+var PathToTemplates = "./template"
 
 type TemplateData struct {
 	StringMap     map[string]string
@@ -29,15 +29,15 @@ type TemplateData struct {
 
 func Render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) {
 	partials := []string{
-		fmt.Sprintf("%s/base.layout.gohtml", pathToTemplates),
-		fmt.Sprintf("%s/header.partial.gohtml", pathToTemplates),
-		fmt.Sprintf("%s/navbar.partial.gohtml", pathToTemplates),
-		fmt.Sprintf("%s/footer.partial.gohtml", pathToTemplates),
-		fmt.Sprintf("%s/alerts.partial.gohtml", pathToTemplates),
+		fmt.Sprintf("%s/base.layout.gohtml", PathToTemplates),
+		fmt.Sprintf("%s/header.partial.gohtml", PathToTemplates),
+		fmt.Sprintf("%s/navbar.partial.gohtml", PathToTemplates),
+		fmt.Sprintf("%s/footer.partial.gohtml", PathToTemplates),
+		fmt.Sprintf("%s/alerts.partial.gohtml", PathToTemplates),
 	}
 
 	var templateSlice []string
-	templateSlice = append(templateSlice, fmt.Sprintf("%s/%s", pathToTemplates, t))
+	templateSlice = append(templateSlice, fmt.Sprintf("%s/%s", PathToTemplates, t))
 
 	templateSlice = append(templateSlice, partials...)
 
