@@ -48,5 +48,5 @@ func (cfg *Config) ListenForMail() {
 
 func (cfg *Config) PostMail(msg Message) {
 	cfg.Wg.Add(1)
-	cfg.Mailer.MailerChan <- msg // Important: If a chan is not created it will be nil and go will hang when it tries to send a msg to a nil chan
+	cfg.Mailer.MailerChan <- msg // Important: If a chan is not created it will be nil and go will hang when it tries to send a msg to a nil chan and must need to listen from the chan (specially incase of unbuffered channel) else it will also cause go to hang. If the chan is unbuffered go will not return until the sent message is received/channel is empty.
 }

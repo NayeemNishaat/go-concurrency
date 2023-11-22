@@ -23,17 +23,38 @@ func TestMain(m *testing.M) {
 	// lib.InitTestConfig()
 	TestConfig = Config{
 		&lib.Config{
-			Wg:            &sync.WaitGroup{},
+			Wg:            &sync.WaitGroup{}, // Note: Always create and initialize wg and chan when testing
 			ErrorChan:     make(chan error),
 			ErrorChanDone: make(chan bool),
 			Mailer: &lib.Mail{
-				MailerChan: make(chan lib.Message),
+				MailerChan: make(chan lib.Message, 100), // Important: Must be a buffered chan else it will wait/hang until the message sent to the channel is received (channel becomes empty).
 				ErrorChan:  make(chan error),
 				DoneChan:   make(chan bool),
 			},
 			Models: model.Models{User: &model.TestUser{}, Plan: &model.TestPlan{}},
 		},
 	}
+
+	TestConfig.Mailer.Wait = TestConfig.Wg
+
+	go func() {
+		select {
+		case <-TestConfig.ErrorChan: // Important: Must need to listen to the created channels
+		case <-TestConfig.ErrorChanDone:
+			return
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case <-TestConfig.Mailer.MailerChan:
+			case <-TestConfig.Mailer.ErrorChan:
+			case <-TestConfig.Mailer.DoneChan:
+				return
+			}
+		}
+	}()
 
 	os.Exit(m.Run())
 }
