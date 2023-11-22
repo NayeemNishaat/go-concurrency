@@ -170,7 +170,7 @@ func (cfg *Config) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	validPassword, err := user.PasswordMatches(password)
-	// validPassword, err := cfg.Models.User.PasswordMatches(password) // Note: For making the test pass as we didn't used repository pattern for testing and choosed to isolate the testing invironment from prod env
+	// validPassword, err := cfg.Models.User.PasswordMatches(password) // Note: For making the test pass as we didn't used repository pattern for testing and choosed to isolate the testing db from the prod
 
 	msg := lib.Message{
 		To:      []string{user.Email},
