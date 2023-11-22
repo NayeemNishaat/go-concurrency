@@ -63,3 +63,10 @@ func TestMain(m *testing.M) {
 // infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 // log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 // infoLog.Printf("%s", "str")
+
+// go test .
+// go test . -v
+// go test ./...
+// go test -coverprofile=coverage.out
+// go test -coverprofile=coverage.out
+// go tool cover -html=coverage.out
