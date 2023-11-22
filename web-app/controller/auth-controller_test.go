@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 	"web/lib"
@@ -26,5 +27,15 @@ func TestLogin(t *testing.T) {
 
 	if rr.Code != http.StatusSeeOther {
 		t.Error("Wrong code returned!")
+	}
+
+	cookies := rr.Result().Cookies()
+
+	tokenExist := slices.ContainsFunc(cookies, func(c *http.Cookie) bool {
+		return c.Name == "token"
+	})
+
+	if !tokenExist {
+		t.Error("Login Failed")
 	}
 }
