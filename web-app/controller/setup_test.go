@@ -3,11 +3,15 @@ package controller
 import (
 	"log"
 	"os"
+	"sync"
 	"testing"
 	"web/lib"
+	"web/model"
 
 	"github.com/joho/godotenv"
 )
+
+var TestConfig Config
 
 func TestMain(m *testing.M) {
 	err := godotenv.Load("../.env")
@@ -16,7 +20,20 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Error loading .env file")
 	}
 
-	lib.InitTestConfig()
+	// lib.InitTestConfig()
+	TestConfig = Config{
+		&lib.Config{
+			Wg:            &sync.WaitGroup{},
+			ErrorChan:     make(chan error),
+			ErrorChanDone: make(chan bool),
+			Mailer: &lib.Mail{
+				MailerChan: make(chan lib.Message),
+				ErrorChan:  make(chan error),
+				DoneChan:   make(chan bool),
+			},
+			Models: model.Models{User: &model.TestUser{}, Plan: &model.TestPlan{}},
+		},
+	}
 
 	os.Exit(m.Run())
 }
