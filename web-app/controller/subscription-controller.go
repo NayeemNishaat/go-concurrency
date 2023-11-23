@@ -14,6 +14,8 @@ import (
 	"web/model"
 )
 
+var TMP_PATH = "./tmp"
+
 func (cfg *Config) PlanPage(w http.ResponseWriter, r *http.Request) {
 	plans, err := cfg.Models.Plan.GetAll()
 	if err != nil {
@@ -92,22 +94,22 @@ func (cfg *Config) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 		pdf := cfg.GenerateManual(user, plan)
 
-		err := pdf.OutputFileAndClose(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
+		err := pdf.OutputFileAndClose(fmt.Sprintf("%s/%d_manual.pdf", TMP_PATH, user.ID))
 
 		if err != nil {
 			cfg.ErrorChan <- err
 			return
 		}
 
-		byteFile, err := os.ReadFile(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
+		byteFile, err := os.ReadFile(fmt.Sprintf("%s/%d_manual.pdf", TMP_PATH, user.ID))
 
 		if err != nil {
 			cfg.ErrorChan <- err
-			os.Remove(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
+			os.Remove(fmt.Sprintf("%s/%d_manual.pdf", TMP_PATH, user.ID))
 			return
 		}
 
-		os.Remove(fmt.Sprintf("./tmp/%d_manual.pdf", user.ID))
+		os.Remove(fmt.Sprintf("%s/%d_manual.pdf", TMP_PATH, user.ID))
 
 		msg := lib.Message{
 			To:      []string{user.Email},

@@ -20,7 +20,8 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Error loading .env file")
 	}
 
-	// lib.InitTestConfig()
+	TMP_PATH = "../tmp"
+
 	TestConfig = Config{
 		&lib.Config{
 			Wg:            &sync.WaitGroup{}, // Note: Always create and initialize wg and chan when testing
@@ -49,6 +50,7 @@ func TestMain(m *testing.M) {
 		for {
 			select {
 			case <-TestConfig.Mailer.MailerChan:
+				TestConfig.Wg.Done() // Warning: Don't use defer here. If defer is used then this statement will be move to the end of the function which will cause go to hang since the WaitGroup is not decremented.
 			case <-TestConfig.Mailer.ErrorChan:
 			case <-TestConfig.Mailer.DoneChan:
 				return
@@ -66,6 +68,7 @@ func TestMain(m *testing.M) {
 
 // go test .
 // go test . -v
+// go test -race . -v
 // go test ./...
 // go test -coverprofile=coverage.out
 // go test -coverprofile=coverage.out
