@@ -8,7 +8,7 @@ type Config struct {
 	*lib.Config
 }
 
-var Cfg = &Config{lib.Cfg}
+var Cfg *Config
 
 func InitCfg(c *lib.Config) {
 	Cfg = &Config{c}
